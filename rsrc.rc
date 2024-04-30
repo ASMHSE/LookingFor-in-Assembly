@@ -1,0 +1,45 @@
+// *************************************************************************************************
+
+#include "\masm64\include64\resource.h"
+
+
+// *************************************************************************************************
+
+1 24 "manifest.xml"    // manifest file
+
+10 ICON MOVEABLE PURE LOADONCALL DISCARDABLE "icon.ico"
+
+
+// *************************************************************************************************
+
+#include "dlgs.rc"
+
+// *************************************************************************************************
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION 1, 0, 0, 0
+PRODUCTVERSION 1, 0, 0, 0
+FILEOS VOS__WINDOWS32
+FILETYPE VFT_APP
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904B0"
+    BEGIN
+      VALUE "CompanyName",      "The MASM64 SDK\000"
+      VALUE "FileDescription",  "Search items in file system\000"
+      VALUE "FileVersion",      "1.0\000"
+      VALUE "InternalName",     "LookingFor\000"
+      VALUE "OriginalFilename", "LookingFor.exe\000"
+      VALUE "LegalCopyright",   "\251 2024 The MASM64 SDK\000"
+      VALUE "ProductName",      "LookingFor\000"
+      VALUE "ProductVersion",   "1.0\000"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 0x4B0
+  END
+END
+
+// *************************************************************************************************

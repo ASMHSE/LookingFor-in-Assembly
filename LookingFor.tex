@@ -1,0 +1,71 @@
+\documentclass[11pt,a4paper]{scrartcl}
+\usepackage{rawfonts}
+\usepackage{amssymb}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,267mm},
+ left=25mm,
+ top=20mm,
+ bottom=20mm,
+ right=25mm
+  }
+
+\usepackage{color}
+\definecolor{astral}{RGB}{46,116,181}
+\definecolor{myblue}{rgb}{0.25,0.25,0.5}
+
+\usepackage{sectsty}
+\sectionfont{\color{astral}}
+
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=red]{hyperref}
+
+\setlength{\parskip}{1.5ex plus 0.5ex minus 0.5ex}
+\usepackage{indentfirst}
+
+\begin{document}
+\title{\color{myblue}{LookingFor }}
+\subtitle{\color{myblue}{A Masm64 tool to find strings in files}}
+
+\author{Héctor S. Enrique}
+\date{ april 30, 2024}
+\maketitle
+
+\section{Running the Program: }
+
+    \begin{itemize}
+        \item Step 1: Enter target, that is a path and some file mask, for example:
+         
+        \hspace{4cm} \verb$\Masm64\*.as?|*.inc$. 
+        
+        \item Step 2: Enter strings to search. If no string is entered then all files that fit the mask are listed. If there are two strings, files listed match both.
+        \item Step 3: For each string set modes to search:
+	 \subitem case: sensitive, insensitive or ignore first char
+	 \subitem word: partial word, full word, or full with underscore (usually a compose word) 
+        \item Step 4:  If You want to exclude files fitting some mask, write that in ``excluded'' cell (for example *.exe|*.lib|*.dll|*.obj)
+        \item Step 5 : When entered two strings, is possible to restrict the search to some distance between them. Enter in cell ``maxDist'' the number of bytes.
+        \item Step 6 : Adittionally, files to search can be limited by size writing megabyte size in cell ``maxMb''.
+        \item Step 7 : Click ``Find'' button.
+     \end{itemize}
+
+\section{Values storage: }
+
+	After first running the program will create an .ini file to store current target and search parameters.
+	
+	Buttons ``+'' and ``-'' allow to store or remove current target from an specific list also stored in same file. 
+
+\section{Additional Information}
+
+	The program was builded with Masm64 SDK.
+	
+	Source code and discussion is is available at:
+    \begin{itemize}
+	
+	\item \href{https://masm32.com/board/index.php?topic=11888.0}{LookingFor: a Masm64 tool to find strings in files} (in Masm32 Forum) 
+	\item \href{https://github.com/ASMHSE/LookingFor-in-Assembly}{LookingFor\_in\_Assembly} (in GitHub) 
+     \end{itemize}
+	
+
+\thispagestyle{empty}
+
+\end{document}
