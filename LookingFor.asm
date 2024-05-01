@@ -181,9 +181,16 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             .switch wParam
                 .case 202
                     .if MasterLock == 0
+                        invoke SendMessage, hbutton1, WM_SETTEXT, 0, ADDR but1_b
                         mov MasterLock, 1
                         invoke CreateThread, NULL, 0, addr app_run, 0, 0, NULL
+                        mov Thread1, rax
                         invoke SetFocus, hlist
+                    .else
+                        invoke TerminateThread, Thread1,0
+                        mov MasterLock, 0
+                        invoke SendMessage, hbutton1, WM_SETTEXT, 0, ADDR but1_a
+                        invoke SendMessage, hStatus, SB_SETTEXT, 0, "Canceled!"
                     .endif    
                     .return 0
                 .case 203
@@ -235,7 +242,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             invoke CreateStatusWindow,WS_CHILD or WS_VISIBLE, NULL, hWin, 201
             mov hStatus, rax
     
-            mov hbutton1, rv(buttonp,hInstance,hWin,"Find",0,0,0,0,202)
+            mov hbutton1, rv(buttonp,hInstance,hWin, addr but1_a,0,0,0,0,202)
             mov hbutton2, rv(buttonp,hInstance,hWin,"Help",0,0,0,0,203)
             mov hbutton3, rv(buttonp,hInstance,hWin,"About",0,0,0,0,204)
             mov hbutton4, rv(button,hInstance,hWin,"-",0,0,0,0,206)

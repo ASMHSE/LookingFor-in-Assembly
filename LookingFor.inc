@@ -60,6 +60,8 @@
 
         classname   db "lookingfor_class",0
         caption     db "LookingFor",0
+        but1_a      db "Find",0
+        but1_b      db "Cancel",0
 
         szReg       db "\LookingFor.ini",0
         key1        db "Window",0
@@ -84,6 +86,7 @@
         unidad      db "1",0
         empty       db 0
 
+        Thread1             dq  0
         string1case         dq  1
         string1word         dq  0
         string2case         dq  1

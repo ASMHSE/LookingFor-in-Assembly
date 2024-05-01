@@ -221,6 +221,7 @@ app_run proc
         invoke SendMessage, hlist, LB_SETCURSEL, 0, 0
         invoke SetFocus, hlist
     .endif
+    invoke SendMessage, hbutton1, WM_SETTEXT, 0,addr but1_a
     mov MasterLock, 0
     ret
 app_run endp
