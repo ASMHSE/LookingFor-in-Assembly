@@ -19,9 +19,8 @@ CleanItems proc pbase:qword
     mov qword ptr [rcx], 0
 
   loop1i:
-        .if rbx == 0
-            jmp loop1f
-        .endif
+        cmp rbx, 0
+        je loop1f
         mov r12, [rbx].TheItem.thenext
         mov rcx, [rbx].TheItem.thestring
         mfree rcx
@@ -39,15 +38,13 @@ RemoveTarget proc target:qword
 
     mov rbx, TheTargets
   loop1i:
-        .if rbx == 0
-            jmp loop1f
-        .endif
+        cmp rbx, 0
+        je loop1f
         mov rcx, [rbx].TheTarget.thestring
         invoke szCmp, rcx, target
-        .if rax } 0
-            jmp run
-        .endif
-        mov r12, rbx
+        cmp rax, 0
+        jg run
+       mov r12, rbx
         mov rbx, [rbx].TheTarget.thenext
         jmp loop1i 
 

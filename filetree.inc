@@ -126,10 +126,8 @@ cb_file_tree proc pfilename:QWORD, pwfd:QWORD, upatn:QWORD, uexcl:QWORD
     invoke SendMessage, hStatus, SB_SETTEXT, 0, str$(filecandt)
 
     invoke GetCurrentDirectory, 1024, pdir
-    mov buffer3, 0
-    invoke szappend, pfile, pdir, 0
-    invoke szappend, pfile, "\", rax
-    invoke szappend, pfile, pfilename, rax
+;    mov buffer3, 0
+    mcat pfile, pdir, "\", pfilename
 
     mov rax, 0
     .if criterios } 0
