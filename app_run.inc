@@ -95,7 +95,8 @@ app_run proc
     mov al, [rcx]
     .if al == 0
         invoke MessageBox,0,"Path target problem", addr caption,MB_OK
-        mov MasterLock, 0
+        invoke SendMessage, hStatus, SB_SETTEXT, 0, "Failed!"
+        jmp app_out
         ret
     .endif    
 
@@ -104,7 +105,8 @@ app_run proc
     mov al, [rcx]
     .if al == 0
         invoke MessageBox,0,"Name or extension target problem", addr caption,MB_OK
-        mov MasterLock, 0
+        invoke SendMessage, hStatus, SB_SETTEXT, 0, "Failed!"
+        jmp app_out
         ret
     .endif    
     invoke SelectionMount, addr TheInclusion, addr searchname
@@ -221,6 +223,8 @@ app_run proc
         invoke SendMessage, hlist, LB_SETCURSEL, 0, 0
         invoke SetFocus, hlist
     .endif
+
+app_out:
     invoke SendMessage, hbutton1, WM_SETTEXT, 0,addr but1_a
     mov MasterLock, 0
     ret
