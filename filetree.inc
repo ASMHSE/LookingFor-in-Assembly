@@ -8,9 +8,7 @@
                 lea rax, wfd.cFileName
                 conout "dir = ", rax, lf
               ENDIF
-                lea rax, wfd.cFileName
-                invoke MessageBox,0, cat$(pbuf,"Fail to set directory",lf, rax,\
-                         ADDR wfd.cFileName),addr caption,MB_OK
+                    invoke MessageBox,0, "Fail to set directory", addr caption,MB_OK
                 jmp close_file
             .endif
             invoke file_tree,lpcb,upatn,uexcl,flag    ; recurse to next directory level
@@ -29,10 +27,7 @@
           IF TRACKING_CRASH 
             conout "to deep",lf
           ENDIF
-            mov pbuf, ptr$(buffer)
-            lea rax, wfd.cFileName
-            invoke MessageBox,0, cat$(pbuf,"Path to deep to open filey",lf, rax,\
-                         ADDR wfd.cFileName),addr caption,MB_OK
+            invoke MessageBox,0, "Path to deep to open filey", addr caption,MB_OK
         .endif
     endm
 
