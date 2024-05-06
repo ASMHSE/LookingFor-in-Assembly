@@ -111,7 +111,7 @@ Boyer_Moore_Search proc pfilename : QWORD
 
 loop1:
 
-    invoke Boyer_Moore, addr bad_chars1, pos, psearch1, dsize1
+    invoke Boyer_Moore1, addr bad_chars1, pos, psearch1, dsize1
     
     mov return_value, eax
     .if return_value == -1
@@ -153,7 +153,7 @@ loop1:
                 mov pos2, 0
             .endif
         
-            invoke Boyer_Moore, addr bad_chars2, pos2, psearch2, dsize2
+            invoke Boyer_Moore2, addr bad_chars2, pos2, psearch2, dsize2
             
             mov return_value2, eax
             .if return_value2 == -1

@@ -144,28 +144,28 @@ app_run proc
 
     .if criterios } 0
         .if string1case == 0
-            q2q Boyer_Moore, Boyer_MooreSens
+            q2q Boyer_Moore1, Boyer_MooreSens
             q2q Boyer_Moore_Table, Boyer_Moore_TableSens
         .elseif string1case == 1
-            q2q Boyer_Moore, Boyer_MooreIns
+            q2q Boyer_Moore1, Boyer_MooreIns
             invoke szUpper, psearch1
             q2q Boyer_Moore_Table, Boyer_Moore_TableIns
         .else
-            q2q Boyer_Moore,Boyer_MooreIgn
+            q2q Boyer_Moore1,Boyer_MooreIgn
             q2q Boyer_Moore_Table, Boyer_Moore_TableIgn
         .endif
         invoke Boyer_Moore_Table, addr bad_chars1, psearch1, dsize1
 
         .if criterios == 2
             .if string2case == 0
-                q2q Boyer_Moore, Boyer_MooreSens
+                q2q Boyer_Moore2, Boyer_MooreSens
                 q2q Boyer_Moore_Table, Boyer_Moore_TableSens
             .elseif string2case == 1
-                q2q Boyer_Moore,Boyer_MooreIns
+                q2q Boyer_Moore2,Boyer_MooreIns
                 invoke szUpper, psearch2
                 q2q Boyer_Moore_Table, Boyer_Moore_TableIns
             .else
-                q2q Boyer_Moore,Boyer_MooreIgn
+                q2q Boyer_Moore2,Boyer_MooreIgn
                 q2q Boyer_Moore_Table, Boyer_Moore_TableIgn
             .endif
             invoke Boyer_Moore_Table, addr bad_chars2, psearch2, dsize2

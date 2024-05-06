@@ -91,8 +91,9 @@
         string1word         dq  0
         string2case         dq  1
         string2word         dq  0
-        Boyer_Moore         dq  0
         Boyer_Moore_Table   dq  0
+        Boyer_Moore1        dq  0
+        Boyer_Moore2        dq  0
 
 
         CurDir      db  260 dup(0)
@@ -166,3 +167,5 @@
             mov a1, rax
         endif
     endm
+
+
