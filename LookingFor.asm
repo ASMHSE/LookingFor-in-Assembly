@@ -2,13 +2,18 @@
 
     include \masm64\include64\masm64rt.inc
 
+ ;   include \masm64\include64\advapi32.inc
+ ;   includelib \masm64\lib64\advapi32.lib
+
+
+;    AllowPromotions equ 1
+;    include macros64G3.inc
+
     include LookingFor.inc
 
     ;   For cleanning disk and possible bugs test use 1 
     TRACKING_CRASH equ 0
-    ;TRACKING_CRASH equ 1       ; Also need to be linked like CONSOLE
-
-
+;    TRACKING_CRASH equ 1       ; Also need to be linked like CONSOLE
 
     .code
 
@@ -175,6 +180,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
     LOCAL Rct: RECT, Rct1: RECT
     LOCAL sbh: DWORD, sbParts[2] :DWORD
     LOCAL rct:RECT
+    LOCAL BaseDir[260] : BYTE
 
     .switch uMsg
         .case WM_COMMAND
@@ -194,7 +200,10 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                     .endif    
                     .return 0
                 .case 203
+
                     ;call ShowTargets
+                    invoke GetAppPath, addr BaseDir
+                    invoke SetCurrentDirectory,  addr BaseDir 
                     invoke ShellExecute, hWin, "open", "LookingFor.pdf", 0, 0, SW_RESTORE
                     .if eax {= 32
         	           invoke  MessageBox, hWin, "Could not open LookingFor.pdf", "LookingFor:", MB_OK

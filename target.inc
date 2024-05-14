@@ -44,7 +44,7 @@ RemoveTarget proc target:qword
         invoke szCmp, rcx, target
         cmp rax, 0
         jg run
-       mov r12, rbx
+        mov r12, rbx
         mov rbx, [rbx].TheTarget.thenext
         jmp loop1i 
 
@@ -114,13 +114,14 @@ StoreTarget proc target:qword
     mov rbx, TheTargets
     .if rbx {} 0
       loop1:
-        invoke szCmpi, qword ptr [rbx].TheTarget.thestring, target
+        mov rcx, [rbx].TheTarget.thestring
+        invoke szCmp, rcx, target
         cmp rax, 0
         jne quit
         conout str$(rax),lf 
         mov rbx, [rbx].TheTarget.thenext
-        xor rbx, rbx
-        jnz loop1
+        cmp rbx, 0
+        jne loop1
 
         mov r12, alloc(sizeof TheTarget)
         mov rbx, alloc(len(target))
@@ -173,12 +174,13 @@ checkname proc pchain:QWORD, pname:QWORD
     USING rbx, r12, r13
     SaveRegs
 
+    ;conout "checkname  ", pchain,"  ",pname," " 
+
     mov r13, 0
     mov rbx, pchain
   loop1i:
-        .if rbx == 0
-            jmp loop1f
-        .endif
+        cmp rbx, 0
+        je loop1f
         mov r12,  [rbx].TheItem.thestring
         mov r12, [rbx].TheItem.thenext
         mov rcx, [rbx].TheItem.thestring
@@ -187,6 +189,7 @@ checkname proc pchain:QWORD, pname:QWORD
         mov rbx, r12
         jmp loop1i
   loop1f:
+    ;conout str$(r13),lf
     mov rax, r13
     RestoreRegs
     ret
@@ -199,9 +202,8 @@ ShowItems proc items:qword
 
     mov rbx, items
   loop1i:
-        .if rbx == 0
-            jmp loop1f
-        .endif
+        cmp rbx, 0
+        je loop1f
         mov r12, [rbx].TheItem.thenext
         mov rax, [rbx].TheItem.thestring
         conout rax, lf

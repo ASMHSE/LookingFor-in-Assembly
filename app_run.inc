@@ -6,6 +6,7 @@ TheItem ends
 .data
     TheExclusion dq 0
     TheInclusion dq 0
+    point1       dq 0
 
 .code
 
@@ -21,6 +22,11 @@ chargep proc pchain:QWORD, localbuf:QWORD
     mov rax, [rcx]
     mov [r12].TheItem.thenext, rax
     mov [rcx], r12
+    dec rdi
+    cmp byte ptr[rdi], "."
+    jne local1
+    mov point1, 1
+  local1:
     ret
 chargep endp
 
@@ -57,8 +63,7 @@ SelectionMount proc pchain:QWORD, cadena:QWORD
   loop1f:
 
     lea rax, extension
-    add rax, 1
-    .if rax {} rdi
+    .if rdi } 0
         invoke chargep, pchain, addr extension
     .endif
 
@@ -86,6 +91,8 @@ app_run proc
     LOCAL searchname[260]:BYTE
 
     invoke SendMessage,hStatus,SB_SETTEXT,0,"loading parameters..."
+
+    mov point1, 0
     
     invoke SendMessage, hlist, LB_RESETCONTENT, 0, 0
 
@@ -109,7 +116,7 @@ app_run proc
         jmp app_out
         ret
     .endif    
-    invoke SelectionMount, addr TheInclusion, addr searchname
+    invoke SelectionMount, addr TheInclusion, addr searchname     ; ????
 
     mov criterios, 0    
     invoke SendMessage, hedit2, WM_GETTEXT, 259, addr buffer1

@@ -86,6 +86,12 @@ cb_file_tree proc pfilename:QWORD, pwfd:QWORD, upatn:QWORD, uexcl:QWORD
     LOCAL buffer2[1024]:BYTE
     LOCAL buffer3[1024]:BYTE
 
+
+          IF TRACKING_CRASH 
+            conout "cb_file  -  " , pfilename, lf
+          ENDIF
+
+
   ; ----------------------
   ; don't list a directory
   ; ----------------------
@@ -99,14 +105,25 @@ cb_file_tree proc pfilename:QWORD, pwfd:QWORD, upatn:QWORD, uexcl:QWORD
     mov pfile, ptr$(buffer3)
 
     mov pfilename, lcase$(pfilename)
+    .if point1 } 0
+        invoke szLen, pfilename
+        mov rcx, rax
+        mov rdi, pfilename
+        mov al, "."
+        repne scasb
+        je jump1
+        mcat pfilename, pfilename, "."
+      jump1: 
+    .endif
   ; --------------------------------
   ; user file extension is specified
   ; --------------------------------
     fn checkname, upatn, pfilename
-    test eax, eax
+    test rax, rax
     jz @F
+
     fn checkname, uexcl, pfilename
-    test eax, eax
+    test rax, rax
     jnz @F
 
     .if maxMb } 0
@@ -121,7 +138,6 @@ cb_file_tree proc pfilename:QWORD, pwfd:QWORD, upatn:QWORD, uexcl:QWORD
     invoke SendMessage, hStatus, SB_SETTEXT, 0, str$(filecandt)
 
     invoke GetCurrentDirectory, 1024, pdir
-;    mov buffer3, 0
     mcat pfile, pdir, "\", pfilename
 
     mov rax, 0
