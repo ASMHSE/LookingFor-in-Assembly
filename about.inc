@@ -36,7 +36,7 @@ AboutDlg proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
              db "A simple tool to search expressions in files.",13,10,13,10
              db "The operating system reports...",0
 
-        tail db "A 64 bit Portable Executable Application by HSE.",13,10
+        tail db "A 64 bit Portable Executable Application by HSE",13,10
              db "Wickedly Crafted In Microsoft Assembler <MASM>",0
       .code
 

@@ -5,8 +5,8 @@
             .if rax == 0
                 mov pbuf, ptr$(buffer)
               IF TRACKING_CRASH 
-                lea rax, wfd.cFileName
-                conout "dir = ", rax, lf
+                ;lea rax, wfd.cFileName
+                ;conout "dir = ", rax, lf
               ENDIF
                     invoke MessageBox,0, "Fail to set directory", addr caption,MB_OK
                 jmp close_file

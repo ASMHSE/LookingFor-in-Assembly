@@ -63,6 +63,8 @@
         but1_a      db "Find",0
         but1_b      db "Cancel",0
 
+        sb_msg_1    db "Failed!",0
+
         szReg       db "\LookingFor.ini",0
         key1        db "Window",0
             opt1    db "lft",0

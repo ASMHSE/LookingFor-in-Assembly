@@ -83,7 +83,7 @@ app_run proc
     LOCAL buffer0[260]:BYTE
     LOCAL buffer1[260]:BYTE
     LOCAL buffer2[260]:BYTE
-    LOCAL buffer3[128]:BYTE
+    LOCAL buffer3[260]:BYTE
     LOCAL buffer4[248]:BYTE
 
     LOCAL searchcall[260]:BYTE
@@ -101,17 +101,25 @@ app_run proc
     lea rcx, searchcall
     mov al, [rcx]
     .if al == 0
-        invoke MessageBox,0,"Path target problem", addr caption,MB_OK
-        invoke SendMessage, hStatus, SB_SETTEXT, 0, "Failed!"
+        mcat addr buffer3, "Path target problem"
+        invoke MessageBox,0, addr buffer3, addr caption,MB_OK
+        invoke SendMessage, hStatus, SB_SETTEXT, 0, addr sb_msg_1
         jmp app_out
         ret
+    IF TRACKING_CRASH 
+    .else
+        conout "searchcall = ", addr searchcall, lf
+    ENDIF
     .endif    
 
     invoke NameFromPath, addr buffer0, addr searchname
     lea rcx, searchname
     mov al, [rcx]
     .if al == 0
-        invoke MessageBox,0,"Name or extension target problem", addr caption,MB_OK
+        mcat addr buffer3, "Name or extension target problem:", \
+            lf, lf, tab, "Target Path is:",lf, tab, addr searchcall, \
+            lf, lf, tab, "Target Mask is empty"
+        invoke MessageBox,0,addr buffer3, addr caption,MB_OK
         invoke SendMessage, hStatus, SB_SETTEXT, 0, "Failed!"
         jmp app_out
         ret
@@ -207,11 +215,24 @@ app_run proc
     mov al, [rcx+1]
     .if al == ":"
         invoke SetCurrentDirectory, addr searchcall
+        mov rcx, 0
     .else
         invoke GetCurrentDirectory, 259, addr searchpath
         invoke szappend, addr searchpath, addr searchcall, 2
         invoke SetCurrentDirectory, addr searchpath
+        mov rcx, 1
     .endif
+    .if rax == 0
+        .if rcx == 0
+            mcat addr buffer3, "Fail to set Target Path:",lf,lf, tab, addr searchcall
+        .else
+            mcat addr buffer3, "Fail to set Target Path:",lf,lf, tab, addr searchpath
+        .endif
+        invoke MessageBox, 0, addr buffer3, addr caption,MB_OK
+        invoke SendMessage,hStatus,SB_SETTEXT,0,"looking for..."
+        jmp app_out
+    .endif
+
     invoke SendMessage,hStatus,SB_SETTEXT,0,"looking for..."
      
     mov filecount, 0

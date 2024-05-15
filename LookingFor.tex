@@ -28,7 +28,7 @@
 \subtitle{\color{myblue}{A Masm64 tool to find strings in files}}
 
 \author{Héctor S. Enrique}
-\date{ april 30, 2024}
+\date{ may 15, 2024}
 \maketitle
 
 \section{Running the Program: }
@@ -36,13 +36,17 @@
     \begin{itemize}
         \item Step 1: Enter target, that is a path and some file mask, for example:
          
-        \hspace{4cm} \verb$\Masm64\*.as?|*.inc$. 
+        \verb$              $ Target: \verb$\Masm64\*.as?|*.inc$. 
+        
+	\hspace{1cm} where:\\
+        \verb$              $ Target Path: \verb$\Masm64\     $  (end with backslash character ``\verb$\$'') \\
+        \verb$              $ Target Mask: \verb$*.as?|*.inc  $  (can't be empty). 
         
         \item Step 2: Enter strings to search. If no string is entered then all files that fit the mask are listed. If there are two strings, files listed match both.
         \item Step 3: For each string set modes to search:
 	 \subitem case: sensitive, insensitive or ignore first char
 	 \subitem word: partial word, full word, or full with underscore (usually a compose word) 
-        \item Step 4:  If You want to exclude files fitting some mask, write that in ``excluded'' cell (for example *.exe|*.lib|*.dll|*.obj)
+        \item Step 4:  If You want to exclude files fitting some mask, write that in ``excluded'' cell (for example \verb$*.exe|*.lib|*.dll|*.obj$)
         \item Step 5 : When entered two strings, is possible to restrict the search to some distance between them. Enter in cell ``maxDist'' the number of bytes.
         \item Step 6 : Adittionally, files to search can be limited by size writing megabyte size in cell ``maxMb''.
         \item Step 7 : Click ``Find'' button.
@@ -52,7 +56,7 @@
 
 	After first running the program will create an .ini file to store current target and search parameters.
 	
-	Buttons ``+'' and ``-'' allow to store or remove current target from an specific list also stored in same file. 
+	Buttons ``+'' and ``--'' allow to store or remove current target from an specific list also stored in same file. 
 
 \section{Additional Information}
 
