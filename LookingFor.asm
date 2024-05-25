@@ -19,6 +19,7 @@
 
     include BMSearch.inc        
     include about.inc
+    include assoc.inc
     include match.inc
     include filetree.inc
     include target.inc
@@ -128,6 +129,7 @@ app_init proc
     RRegSize key1, opt4, naranja, ghgt
 
     mov WM_TARGETSLISTCHANGE, rv(RegisterWindowMessage,"targets_list_change")
+    mov WM_EXTASSOCIATIONCHANGE, rv(RegisterWindowMessage,"ext_association_change")
 
     ret
 app_init endp
@@ -301,7 +303,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             RRegMode key2,opt08,naranja,hcb2    
             RRegMode key2,opt09,unidad,hcb3    
             RRegMode key2,opt10,naranja,hcb4    
-
+            invoke RetrieveAssoc
             invoke SetFocus, hbutton1		
 
             .return 0
@@ -312,6 +314,13 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                 invoke SendMessage,hedit1,CB_RESETCONTENT,0,0
                 invoke RetrieveTargets
                 invoke SendMessage,hedit1,WM_SETTEXT,0, ADDR dfbuff
+            .else
+                mov AddLock, 0
+            .endif
+            .return 0
+        .case WM_EXTASSOCIATIONCHANGE
+            .if AddLock == 0
+                invoke RetrieveAssoc
             .else
                 mov AddLock, 0
             .endif

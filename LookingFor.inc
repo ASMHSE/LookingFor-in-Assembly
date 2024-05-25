@@ -51,6 +51,11 @@
 
         aBrush       dq ?
 
+        EditorBat   db  260 dup(?)
+        EditorCmd   db  260 dup(?)
+        EditorJs    db  260 dup(?)
+
+
     .data
 
         glft         dq 0
@@ -83,6 +88,11 @@
             opt09   db "cb3",0
             opt10   db "cb4",0
         key3        db "Targets",0
+        key4        db "Associations",0
+            opt001  db "bat",0
+            opt002  db "cmd",0
+            opt003  db "js",0
+
 
         naranja     db "0",0
         unidad      db "1",0
@@ -97,11 +107,12 @@
         Boyer_Moore1        dq  0
         Boyer_Moore2        dq  0
 
-
         CurDir      db  260 dup(0)
         szBuff      db  256 dup(0)
         szBuff1     db   25 dup(0)  
         szBuff2     db   25 dup(0)
+
+        prevented   dq  0
 
         maxMb       dq 0
         maxDist     dd 0
@@ -115,17 +126,23 @@
         EscapeLock  dq 0
         AddLock     dq 0
 
-
         criterios   dq 0
         psearch1    dq 0
         psearch2    dq 0
         dsize1      dd 0
         dsize2      dd 0
 
-        WM_TARGETSLISTCHANGE dq 0
+        WM_TARGETSLISTCHANGE    dq 0
+        WM_EXTASSOCIATIONCHANGE dq 0
 
+        default_editor db "\masm64\qeditor", 0
 
-
+        err0 db "Could not open",0
+        err1 db "There is no application associated",13,10,\
+                "with the given filename extension.",0
+        err2 db "The specified path was not found",0
+        err3a db "Editor for ",0
+        err3b db " files currently is:",0
 
     IFNDEF MEMORYSTATUSEX
       MEMORYSTATUSEX STRUCT QWORD

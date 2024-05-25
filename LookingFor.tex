@@ -40,7 +40,7 @@
         
 	\hspace{1cm} where:\\
         \verb$              $ Target Path: \verb$\Masm64\     $  (end with backslash character ``\verb$\$'') \\
-        \verb$              $ Target Mask: \verb$*.as?|*.inc  $  (can't be empty). 
+        \verb$              $ Target Mask: \verb$*.as?|*.inc  $  (can't be empty, at least a wildcard ``\verb$*$'') 
         
         \item Step 2: Enter strings to search. If no string is entered then all files that fit the mask are listed. If there are two strings, files listed match both.
         \item Step 3: For each string set modes to search:
@@ -58,6 +58,14 @@
 	
 	Buttons ``+'' and ``--'' allow to store or remove current target from an specific list also stored in same file. 
 
+\section {Files matching definitions}
+	
+	Clicking with mouse or pressing Enter key will open selected file in result list. Because is a tool for programming, is expected that extensions of interest have associated an editor.
+	
+	Executable files will not open to prevent unwanted runnings. 
+	
+	In similar way *.bat, *.cmd and *.js files will not run. But in this cases they will open in an editor. By default /masm64/qeditor is that editor. But is possible to select a new path or editor. If default or stored editor fail, a dialog will ask a new path or editor. Later, editor could be changed in LookingFor.ini file.
+	
 \section{Additional Information}
 
 	The program was builded with Masm64 SDK.

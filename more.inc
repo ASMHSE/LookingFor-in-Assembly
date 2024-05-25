@@ -13,12 +13,12 @@ endm
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 
 ListProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
-
+    USING r13
   ; -----------------------------------
   ; subclass procedure for the list box
   ; -----------------------------------
-    LOCAL indx  :QWORD                                      ; list box index variable
-    LOCAL pbuf  :QWORD                                      ; buffer pointer
+    LOCAL indx        :QWORD                                ; list box index variable
+    LOCAL pbuf        :QWORD                                ; buffer pointer
     LOCAL buffer0[248]:BYTE                                 ; allocate space for text
     LOCAL buffer1[248]:BYTE                                 ; allocate space for command
 
@@ -31,6 +31,7 @@ ListProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                 .case VK_RETURN
                     jmp beginrun
             .endsw
+
         .case WM_LBUTTONDBLCLK
           beginrun:
             mov EscapeLock, 1
@@ -43,33 +44,60 @@ ListProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             fn szCmp, indx, "exe"
             test eax, eax
             jz @F
-            invoke MessageBox, hWin, "Binaries will not run from here", "LookingFor:", MB_OK
+            invoke MessageBox, hWin, "Binaries will not run from here", addr caption, MB_OK
             ;invoke MsgboxI, hWin, "Binaries will not run from here", "LookingFor:", MB_OK, 10
-            mov eax, 1
-
-            ret
+            .return 0
 @@:
             fn szCmp, indx, "bat"
             
             test eax, eax
             jz @F
-            invoke ShellExecute, hWin, 0, "\masm64\qeditor", pbuf, 0, SW_RESTORE
+            mov prevented, 1
+            invoke ShellExecute, hWin, 0, addr EditorBat, pbuf, 0, SW_RESTORE
             jmp result
 @@:
             fn szCmp, indx, "cmd"
             test eax, eax
             jz @F
-            invoke ShellExecute, hWin, 0, "\masm64\qeditor", pbuf, 0, SW_RESTORE
+            mov prevented, 2
+            invoke ShellExecute, hWin, 0, addr EditorCmd, pbuf, 0, SW_RESTORE
             jmp result
 @@:
+            fn szCmp, indx, "js"
+            test eax, eax
+            jz @F
+            mov prevented, 3
+            invoke ShellExecute, hWin, 0, addr EditorJs, pbuf, 0, SW_RESTORE
+            jmp result
+@@:
+            mov prevented, 0
+
             invoke ShellExecute, hWin, "open", pbuf, 0, 0, SW_RESTORE
 result:
             .if eax {= 32
-        	  invoke  MessageBox, hWin, "Could not open", "LookingFor:", MB_OK
+                .if eax == SE_ERR_NOASSOC	
+                    lea rdx, err1
+                .elseif eax == ERROR_FILE_NOT_FOUND
+                    .if prevented == 0
+                        lea rdx, err2
+                    .else
+                        if 0
+                        SaveRegs
+                        lea r13, buffer0	
+                        mcat r13, addr err3, addr default_editor
+                        mov rdx, r13
+                        RestoreRegs
+                        endif
+                        
+                        invoke DialogBoxParam, hInstance, 1000, hWin, ADDR AssocDlg, 0
+                        .return 0
+                        .endif
+                .else
+                    lea rdx, err0
+                .endif
+        	  invoke  MessageBox, hWin, rdx, addr caption, MB_OK
             .endif
-            mov eax, 1
-            ret
-
+            .return 0
     .endsw
 
     invoke CallWindowProc,lpListProc,hWin,uMsg,wParam,lParam
@@ -319,6 +347,19 @@ WRegMode macro clave, opcion, combo
     WRegSize clave, opcion, rax
 endm
 
+RRegAssoc macro clave, opcion, defecto, namebuf
+    mov namebuf, 0
+    invoke GetPrivateProfileString, ADDR clave, addr opcion, addr defecto,\
+                 addr namebuf, sizeof namebuf, addr CurDir
+endm
+
+WRegAssoc macro clave, opcion, namebuf
+    invoke WritePrivateProfileString, addr clave, addr opcion, addr namebuf, addr CurDir
+endm
+
+
+
+
 fill_cb macro hcombo:req, sel1:req, args:VARARG
     count = 0
     FOR item, <args>
@@ -432,4 +473,21 @@ ShowTargets proc
     RestoreRegs
     ret
 ShowTargets endp 
+
+;***************************************************************************************************
+
+RetrieveAssoc proc
+    RRegAssoc key4, opt001, default_editor, EditorBat
+    RRegAssoc key4, opt002, default_editor, EditorCmd
+    RRegAssoc key4, opt003, default_editor, EditorJs
+    ret
+RetrieveAssoc endp
+
+SaveAssoc proc
+    WRegAssoc key4, opt001, EditorBat
+    WRegAssoc key4, opt002, EditorCmd
+    WRegAssoc key4, opt003, EditorJs
+    ret
+SaveAssoc endp
+
 
