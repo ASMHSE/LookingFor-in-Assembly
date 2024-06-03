@@ -24,11 +24,12 @@
 \usepackage{indentfirst}
 
 \begin{document}
+
 \title{\color{myblue}{LookingFor }}
 \subtitle{\color{myblue}{A Masm64 tool to find strings in files}}
 
 \author{Héctor S. Enrique}
-\date{ may 15, 2024}
+\date{ may 30, 2024}
 \maketitle
 
 \section{Running the Program: }
@@ -50,7 +51,9 @@
         \item Step 5 : When entered two strings, is possible to restrict the search to some distance between them. Enter in cell ``maxDist'' the number of bytes.
         \item Step 6 : Adittionally, files to search can be limited by size writing megabyte size in cell ``maxMb''.
         \item Step 7 : Click ``Find'' button.
+        \item Step 8 : a running search can be stopped any moment clicking same button, wich now show ``Cancel'' text.
      \end{itemize}
+
 
 \section{Values storage: }
 
@@ -58,6 +61,19 @@
 	
 	Buttons ``+'' and ``--'' allow to store or remove current target from an specific list also stored in same file. 
 
+
+\section {More about file mask}
+
+	Some general file masks can be used to search:
+	
+	\hspace{2cm}``*``  in all files, except ``.`` and ``..``
+	
+	\hspace{2cm}``*.`` in files without extension
+
+	\hspace{2cm}``.*`` in only extension files 
+
+	\hspace{2cm}``*.*`` in all files with name and extension
+	
 \section {Files matching definitions}
 	
 	Clicking with mouse or pressing Enter key will open selected file in result list. Because is a tool for programming, is expected that extensions of interest have associated an editor.
@@ -66,6 +82,10 @@
 	
 	In similar way *.bat, *.cmd and *.js files will not run. But in this cases they will open in an editor. By default /masm64/qeditor is that editor. But is possible to select a new path or editor. If default or stored editor fail, a dialog will ask a new path or editor. Later, editor could be changed in LookingFor.ini file.
 	
+\section{Knowledgements}
+
+	To Masm32 forum members that help in testing this application, specially to greenozon for detailed reports.
+
 \section{Additional Information}
 
 	The program was builded with Masm64 SDK.
@@ -78,6 +98,5 @@
      \end{itemize}
 	
 
-\thispagestyle{empty}
 
 \end{document}
