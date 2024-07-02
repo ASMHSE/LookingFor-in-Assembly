@@ -1,6 +1,7 @@
 ; ллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
     file_core macro
-        .if wfd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY
+;        .if wfd.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY || wfd.dwFileAttributes == 17
+        .if wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY
             chdir ADDR wfd.cFileName
             .if rax == 0
                 mov pbuf, ptr$(buffer)
