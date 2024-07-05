@@ -67,6 +67,7 @@ Boyer_Moore_Search proc pfilename : QWORD
     LOCAL plc            :QWORD		;cmd line pointer
     LOCAL saida          :QWORD		;output handle
     LOCAL arquivo        :QWORD		;file handle
+    LOCAL arqmap         :QWORD
     LOCAL mem_aloc       :DWORD		;ptr mem alloc
     LOCAL nada           :dword
     LOCAL pos            :DWORD		;initial position first criterium
@@ -103,6 +104,7 @@ Boyer_Moore_Search proc pfilename : QWORD
     mov r14d, eax
     
     invoke CreateFileMapping, arquivo, NULL,PAGE_READONLY,0,0,0	;mapped file handle
+    mov arqmap, rax
     invoke MapViewOfFile, rax, FILE_MAP_READ,0,0,0			;map it, file contents pointer
     mov r15, rax
     invoke CloseHandle, arquivo						;don't need this anymore
@@ -180,6 +182,7 @@ loop1:
 done:
 
     invoke UnmapViewOfFile, r15
+    invoke CloseHandle, arqmap
 
 quit:    
 
