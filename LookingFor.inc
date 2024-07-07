@@ -55,6 +55,8 @@
         EditorCmd   db  260 dup(?)
         EditorJs    db  260 dup(?)
 
+        BaseDir     db  260 dup(?)
+        HelpDir     db  260 dup(?)
 
     .data
 
@@ -112,6 +114,8 @@
         szBuff1     db   25 dup(0)  
         szBuff2     db   25 dup(0)
 
+        pHelp               dq  0  
+
         prevented   dq  0
 
         maxMb       dq 0
@@ -137,10 +141,10 @@
 
         default_editor db "\masm64\qeditor", 0
 
-        err0 db "Could not open",0
-        err1 db "There is no application associated",13,10,\
-                "with the given filename extension.",0
-        err2 db "The specified path was not found",0
+        err0  db "Could not open",0
+        err1  db "There is no application associated",13,10,\
+                 "with the given filename extension.",0
+        err2  db "The specified path was not found",0
         err3a db "Editor for ",0
         err3b db " files currently is:",0
 

@@ -72,6 +72,7 @@ SelectionMount proc pchain:QWORD, cadena:QWORD
         
 SelectionMount endp
 
+
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 
 app_run proc
@@ -206,7 +207,7 @@ app_run proc
     ;-------------------------------
     invoke SendMessage, hedit6, WM_GETTEXT, 128, addr buffer4 
     invoke vc_sscanf, ADDR buffer4,"%lf", addr lgral1
-    fld lgral1
+    fld  lgral1
     fild megabyte
     fmul
     fistp maxMb

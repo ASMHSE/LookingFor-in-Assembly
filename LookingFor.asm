@@ -121,6 +121,12 @@ app_init proc
 
     ; Ini file 
     invoke GetAppPath, addr CurDir
+    lea rcx, HelpDir
+    mov pHelp, rcx
+    mov byte ptr[rcx], 0  
+    invoke szappend, rcx, addr CurDir, 0
+    invoke szappend, pHelp,"\LookingFor.pdf", rax
+
     invoke szCatStr, addr CurDir, addr szReg
     
     RRegSize key1, opt1, naranja, glft
@@ -173,6 +179,13 @@ msgloop proc
     ret
 msgloop endp
 
+app_help proc hWin:QWORD
+    invoke ShellExecute, hWin, "open", pHelp, 0, 0, SW_RESTORE
+    .if eax {= 32
+        invoke  MessageBox, hWin, "Could not open LookingFor.pdf", "LookingFor:", MB_OK
+    .endif
+    ret
+app_help endp
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 
 WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
@@ -182,7 +195,6 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
     LOCAL Rct: RECT, Rct1: RECT
     LOCAL sbh: DWORD, sbParts[2] :DWORD
     LOCAL rct:RECT
-    LOCAL BaseDir[260] : BYTE
 
     .switch uMsg
         .case WM_COMMAND
@@ -195,21 +207,18 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                         mov Thread1, rax
                         invoke SetFocus, hlist
                     .else
+                        invoke CleanItems, addr TheInclusion                ; after greenozon  07 July 2024, 18:38:28
+                        invoke CleanItems, addr TheExclusion
+
                         invoke TerminateThread, Thread1,0
                         mov MasterLock, 0
                         invoke SendMessage, hbutton1, WM_SETTEXT, 0, ADDR but1_a
                         invoke SendMessage, hStatus, SB_SETTEXT, 0, "Canceled!"
                     .endif    
                     .return 0
-                .case 203
 
-                    ;call ShowTargets
-                    invoke GetAppPath, addr BaseDir
-                    invoke SetCurrentDirectory,  addr BaseDir 
-                    invoke ShellExecute, hWin, "open", "LookingFor.pdf", 0, 0, SW_RESTORE
-                    .if eax {= 32
-        	           invoke  MessageBox, hWin, "Could not open LookingFor.pdf", "LookingFor:", MB_OK
-                    .endif
+                .case 203
+                     invoke CreateThread, NULL, 0, addr app_help, hWin, 0, NULL
                     .return 0
 
                 .case 204
