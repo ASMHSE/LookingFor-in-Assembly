@@ -90,6 +90,8 @@ Boyer_Moore_Search proc pfilename : QWORD
                 OPEN_EXISTING,FILE_FLAG_SEQUENTIAL_SCAN,0           ;open source file
     mov arquivo, rax								;handle
 	
+    mov return_value, 1
+
     invoke GetFileSize, arquivo, NULL                               ;sizeof source file
     cmp eax, 0
     jle quit
