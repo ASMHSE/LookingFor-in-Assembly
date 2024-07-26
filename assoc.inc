@@ -3,20 +3,20 @@
 AssocDlg proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
 
     LOCAL hStatic :QWORD
-    LOCAL hButn1  :QWORD
-    LOCAL hButn2  :QWORD
+    ;LOCAL hButn1  :QWORD
+    ;LOCAL hButn2  :QWORD
     LOCAL hEdit   :QWORD
     LOCAL hText   :QWORD
 
 
-    LOCAL rct     :RECT
+    ;LOCAL rct     :RECT
     LOCAL buffer[1024]:BYTE
     LOCAL pbuff   :QWORD
-    LOCAL vbuffr[64]:BYTE
-    LOCAL vendor  :QWORD
-    LOCAL cpustr  :QWORD
-    LOCAL mstat   :QWORD
-    LOCAL astat   :QWORD
+    ;LOCAL vbuffr[64]:BYTE
+    ;LOCAL vendor  :QWORD
+    ;LOCAL cpustr  :QWORD
+    ;LOCAL mstat   :QWORD
+    ;LOCAL astat   :QWORD
 
     .switch uMsg
         .case WM_INITDIALOG

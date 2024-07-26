@@ -63,19 +63,16 @@
 
 Boyer_Moore_Search proc pfilename : QWORD
 
-    USING rsi, rdi, rbx, r12, r14, r15
+    USING rdi, r12, r14, r15
+    ANNOTATION use: r12 rdi
     LOCAL plc            :QWORD		;cmd line pointer
     LOCAL saida          :QWORD		;output handle
     LOCAL arquivo        :QWORD		;file handle
     LOCAL arqmap         :QWORD
-    LOCAL mem_aloc       :DWORD		;ptr mem alloc
-    LOCAL nada           :dword
     LOCAL pos            :DWORD		;initial position first criterium
     LOCAL return_value   :DWORD		;return result in eax register
-    LOCAL first_r        :DWORD
     LOCAL pos2           :DWORD		;initial position second criterium
     LOCAL return_value2  :DWORD		;return result in eax register
-    LOCAL first_r2       :DWORD
     LOCAL storedsize1    :DWORD
 	
     SaveRegs
@@ -381,6 +378,7 @@ Boyer_Moore_TableIgn endp
 Boyer_MooreSens proc lptable:qword, startpos:dword, lpSubStr:qword, subLngth:dword
 
     USING rbx, rsi, rdi 
+    ANNOTATION prv: r14 r15
 
     SaveRegs
     
@@ -443,6 +441,7 @@ Boyer_MooreSens endp
 Boyer_MooreIns proc lptable:qword, startpos:dword, lpSubStr:qword, subLngth:dword
 
     USING rbx, rsi, rdi 
+    ANNOTATION prv: r14 r15
 
     SaveRegs
 
@@ -508,6 +507,7 @@ Boyer_MooreIns endp
 Boyer_MooreIgn proc lptable:qword, startpos:dword, lpSubStr:qword, subLngth:dword
 
     USING rbx, rsi, rdi 
+    ANNOTATION prv: r14 r15
 
     SaveRegs
     
@@ -578,7 +578,7 @@ Boyer_MooreIgn endp
 Boyer_MooreIgn2 proc lptable:qword, startpos:dword, lpSubStr:qword, subLngth:dword
 
     USING rbx, rsi, rdi 
-
+    ANNOTATION prv: r14 r15
     SaveRegs
     
     mov eax, -2                 ;assume error in parameters data

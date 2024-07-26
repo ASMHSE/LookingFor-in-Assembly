@@ -191,4 +191,6 @@
         endif
     endm
 
-
+    ANNOTATION macro vars:vararg
+    endm
+    

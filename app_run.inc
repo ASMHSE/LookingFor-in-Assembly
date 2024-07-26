@@ -13,6 +13,7 @@ TheItem ends
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 
 chargep proc pchain:QWORD, localbuf:QWORD 
+    ANNOTATION prv: rbx rdi r12
     mov byte ptr[rdi], 0
     mov r12, alloc(sizeof TheItem)
     mov rbx, alloc(len(localbuf))
@@ -34,6 +35,7 @@ chargep endp
 SelectionMount proc pchain:QWORD, cadena:QWORD
     USING rbx,rsi,rdi,r12
     LOCAL extension[128]:byte
+    ANNOTATION use: rbx r12
     SaveRegs
 
     mov useExcl, 0
@@ -76,7 +78,7 @@ SelectionMount endp
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 
 app_run proc
-    USING rbx
+    ;USING rbx
 
     LOCAL pbuf  :QWORD, pbuf4 :QWORD
     LOCAL pcmd  :QWORD, lgral1:REAL8

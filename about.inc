@@ -7,7 +7,6 @@ AboutDlg proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
     LOCAL hText   :QWORD
     LOCAL osInf   :QWORD
     LOCAL wickd   :QWORD
-    LOCAL rct     :RECT
     LOCAL buffer[1024]:BYTE
     LOCAL pbuff   :QWORD
     LOCAL vbuffr[64]:BYTE

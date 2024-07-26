@@ -5,10 +5,10 @@
 ; The main function that checks if two given strings 
 ; match. The first string may contain wildcard characters 
 
-match proc first:QWORD, second:QWORD
+match proc ; first:QWORD, second:QWORD
     USING r13, r14
     SaveRegs
-
+    
     mov r13, rcx
     mov r14, rdx
 

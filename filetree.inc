@@ -4,8 +4,8 @@
         .if wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY
             chdir ADDR wfd.cFileName
             .if rax == 0
-                mov pbuf, ptr$(buffer)
               IF TRACKING_CRASH 
+                mov pbuf, ptr$(buffer)
                 ;lea rax, wfd.cFileName
                 ;conout "dir = ", rax, lf
               ENDIF
@@ -33,11 +33,21 @@
     endm
 
 file_tree proc lpcb:QWORD, upatn:QWORD, uexcl:QWORD, flag:QWORD
+    USING rbx, rdi
+    ANNOTATION use:rbx rdi ; in lpcb
+
     LOCAL hSrch :QWORD
     LOCAL wfd   :WIN32_FIND_DATA
-    LOCAL pbuf  :QWORD
-    LOCAL buffer[1024]:BYTE
-    
+    IF TRACKING_CRASH 
+        LOCAL pbuf  :QWORD             
+        LOCAL buffer[1024]:BYTE
+        ANNOTATION use: pbuf buffer
+    ENDIF
+
+    ANNOTATION use: lpcb upatn uexcl 
+
+    SaveRegs
+
     add flag, 1
     mov hSrch, rv(FindFirstFile,"*.*",ADDR wfd)
     .if hSrch {} INVALID_HANDLE_VALUE
@@ -71,7 +81,7 @@ file_tree proc lpcb:QWORD, upatn:QWORD, uexcl:QWORD, flag:QWORD
     .if flag } 0                            ; flag controlled tail recursion
         chdir ".."                          ; drop back to next lower directory
     .endif
-
+    RestoreRegs
     ret
 
 file_tree endp
@@ -79,14 +89,13 @@ file_tree endp
 ; ллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
 cb_file_tree proc pfilename:QWORD, pwfd:QWORD, upatn:QWORD, uexcl:QWORD
-
+    ANNOTATION prv: rbx rdi ; in file_tree 
     LOCAL pbuf  : QWORD
     LOCAL pdir  : QWORD
     LOCAL pfile : QWORD
     LOCAL buffer1[1024]:BYTE
     LOCAL buffer2[1024]:BYTE
     LOCAL buffer3[1024]:BYTE
-
 
           IF TRACKING_CRASH 
             conout "cb_file  -  " , pfilename, lf

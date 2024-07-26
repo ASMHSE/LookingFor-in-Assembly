@@ -146,7 +146,6 @@ msgloop proc
 
     LOCAL msg    :MSG
     LOCAL pmsg   :QWORD
-    LOCAL focus  :QWORD
 
     mov pmsg, ptr$(msg)                     ; get the msg structure address
     jmp gmsg                                ; jump directly to GetMessage()
@@ -179,6 +178,8 @@ msgloop proc
     ret
 msgloop endp
 
+; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
+
 app_help proc hWin:QWORD
     invoke ShellExecute, hWin, "open", pHelp, 0, 0, SW_RESTORE
     .if eax {= 32
@@ -186,6 +187,7 @@ app_help proc hWin:QWORD
     .endif
     ret
 app_help endp
+
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 
 WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
@@ -359,16 +361,12 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             mov r12, rax
             sub r12, 3
 
-            mov r13, rax
-            add r13, rbx
             invoke MoveWindow, hbutton1,rbx,3,r12,22,TRUE
             add rbx, r12
             add rbx, 3
-            add r13, r12
             invoke MoveWindow, hbutton2,rbx,3,r12,22,TRUE
             add rbx, r12
             add rbx, 3
-            add r13, r12
             invoke MoveWindow, hbutton3,rbx,3,r12,22,TRUE
 
             mov r15d, Rct.right
@@ -425,7 +423,6 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             sub rax, 213
             add r15, 176-93
             invoke MoveWindow, hlist, 3, 210, r15,rax,TRUE
-
             RestoreRegs
  
         .case WM_CLOSE
@@ -463,6 +460,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             call SaveTargets
             RestoreRegs
             invoke SendMessage,hWin,WM_DESTROY,0,0
+
         .case WM_DESTROY
             invoke PostQuitMessage,NULL
 
@@ -496,7 +494,6 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             rcall SetTextColor,wParam,00DDDDDDh
             mov rax, eColor
             ret
-
 
     .endsw
 

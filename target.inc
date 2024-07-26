@@ -11,7 +11,7 @@ TheTarget ends
 .code
 
 
-CleanItems proc pbase:qword
+CleanItems proc ; pbase:qword
     USING rbx, r12
     SaveRegs
 
@@ -73,6 +73,7 @@ RemoveTarget endp
 
 RetrieveTarget proc target:qword
     USING rbx, r12
+    ANNOTATION prv: r13 ; in RetrieveTargets 
     SaveRegs
 
     mov rbx, TheTargets

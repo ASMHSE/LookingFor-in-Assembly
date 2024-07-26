@@ -225,8 +225,6 @@ target_combo endp
 select_combo proc instance:QWORD,parent:QWORD,topx:QWORD, \
                  topy:QWORD,wid:QWORD,hgt:QWORD,idnum:QWORD
 
-    LOCAL hComb :QWORD
-
     invoke CreateWindowEx,WS_EX_LEFT,"COMBOBOX",0, WS_CHILD or WS_VISIBLE or \
                           CBS_HASSTRINGS or WS_VSCROLL or CBS_DROPDOWNLIST or \
                           CBS_NOINTEGRALHEIGHT or CBS_DISABLENOSCROLL, \
@@ -260,8 +258,6 @@ static endp
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 
 buttonp proc instance:QWORD,hparent:QWORD,text:QWORD,topx:QWORD,topy:QWORD,wid:QWORD,hgt:QWORD,idnum:QWORD
-
-    LOCAL hbtt :QWORD
 
     invoke CreateWindowEx,WS_EX_LEFT,"BUTTON",text, \
                           WS_CHILD or WS_VISIBLE or WS_TABSTOP,\
@@ -373,6 +369,7 @@ endm
 
 SaveTargets proc
     USING rbx, r12, r13
+    ANNOTATION prv: r15
     LOCAL opcion[8]:byte
 
     SaveRegs
@@ -408,7 +405,7 @@ SaveTargets endp
 
 RetrieveTargets proc
 
-    USING rbx, r12, r13
+    USING r12, r13
     LOCAL opcion[8]:byte
 
     SaveRegs
