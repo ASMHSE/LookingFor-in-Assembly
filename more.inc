@@ -45,7 +45,6 @@ ListProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             test eax, eax
             jz @F
             invoke MessageBox, hWin, "Binaries will not run from here", addr caption, MB_OK
-            ;invoke MsgboxI, hWin, "Binaries will not run from here", "LookingFor:", MB_OK, 10
             .return 0
 @@:
             fn szCmp, indx, "bat"
@@ -122,6 +121,14 @@ IntProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
         .if wParam } "9"
            .return 0
         .endif
+
+    .elseif uMsg == WM_KEYUP
+
+        .if wParam == VK_RETURN
+           invoke SendMessage, hWnd, WM_COMMAND, 201, 0
+        .return 0
+        .endif
+
     .endif
 
 accept:
@@ -176,7 +183,15 @@ DecProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
         .if wParam } "9"
            .return 0
         .endif
-    .endif
+
+    .elseif uMsg == WM_KEYUP
+
+        .if wParam == VK_RETURN
+           invoke SendMessage, hWnd, WM_COMMAND, 201, 0
+        .return 0
+        .endif
+
+    .endif 
 
 accept:
     
@@ -186,6 +201,24 @@ accept:
 
 DecProc endp
 
+; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
+
+EditProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
+
+    .if uMsg == WM_KEYUP
+        .if wParam == VK_RETURN
+           invoke SendMessage, hWnd, WM_COMMAND, 201, 0
+           .return 0
+        .endif
+    .endif 
+
+accept:
+    
+    invoke CallWindowProc,lpfnEditProc,hWin,uMsg,wParam,lParam
+
+    ret
+
+EditProc endp
 
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 

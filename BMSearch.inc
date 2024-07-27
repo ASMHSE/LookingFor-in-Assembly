@@ -2,7 +2,7 @@
     bad_chars1 dd 256 dup (?)
     bad_chars2 dd 256 dup (?)
 .data
-    ParseChars db ' ',',','|','*','<','>','"','=','(',')','{','}','[',']','^','+','-',':','/','&','!','\','%',13,10,9,"_" 
+    ParseChars db  ' ',',','.','|','*','<','>','"','=','(',')','{','}','[',']','^','+','-',':','/','&','!','\','%',13,10,9,"_" 
 
     $numParseChars EQU $ - ParseChars
 .code
@@ -64,7 +64,7 @@
 Boyer_Moore_Search proc pfilename : QWORD
 
     USING rdi, r12, r14, r15
-    ANNOTATION use: r12 rdi
+    ANNOTATION use: r12 rdi ; in check_full
     LOCAL plc            :QWORD		;cmd line pointer
     LOCAL saida          :QWORD		;output handle
     LOCAL arquivo        :QWORD		;file handle
@@ -378,7 +378,7 @@ Boyer_Moore_TableIgn endp
 Boyer_MooreSens proc lptable:qword, startpos:dword, lpSubStr:qword, subLngth:dword
 
     USING rbx, rsi, rdi 
-    ANNOTATION prv: r14 r15
+    ANNOTATION prv: r14 r15 ; in Boyer_Moore_Search
 
     SaveRegs
     
@@ -441,7 +441,7 @@ Boyer_MooreSens endp
 Boyer_MooreIns proc lptable:qword, startpos:dword, lpSubStr:qword, subLngth:dword
 
     USING rbx, rsi, rdi 
-    ANNOTATION prv: r14 r15
+    ANNOTATION prv: r14 r15 ; in Boyer_Moore_Search
 
     SaveRegs
 
@@ -507,7 +507,7 @@ Boyer_MooreIns endp
 Boyer_MooreIgn proc lptable:qword, startpos:dword, lpSubStr:qword, subLngth:dword
 
     USING rbx, rsi, rdi 
-    ANNOTATION prv: r14 r15
+    ANNOTATION prv: r14 r15 ; in Boyer_Moore_Search
 
     SaveRegs
     
@@ -573,70 +573,3 @@ done:
 
 Boyer_MooreIgn endp
 
-; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
-
-Boyer_MooreIgn2 proc lptable:qword, startpos:dword, lpSubStr:qword, subLngth:dword
-
-    USING rbx, rsi, rdi 
-    ANNOTATION prv: r14 r15
-    SaveRegs
-    
-    mov eax, -2                 ;assume error in parameters data
-    mov rsi, lpSubStr
-    mov rdi, r15
-    mov ebx, r14d
-    mov ecx, subLngth
-	
-    test ebx,ebx
-    jz done
-    test ecx,ecx
-    jz done
-    cmp ecx,ebx
-    ja done
-
-    add rbx, rdi                ;ebx=lpSource+srcLngth
-    mov r8d, startpos           ;edi=lpSource+startpos        
-    add rdi, r8
-
-    mov edx, subLngth
-align 8
-try_again:
-    mov eax, -1
-    cmp rbx, rdi
-    jbe done
-    mov ecx, edx
-@1:
-    xor eax, eax 
-    mov al, byte ptr [rdi+rcx-1]		;read one char from source
-    cmp byte ptr [rsi+rcx-1], al
-    jne @3
-@2:
-    dec ecx
-    jnz @1
-
-    inc ecx
-    sub rdi, r9
-    .if rax } 96 && rax { 123
-        sub rax, 32
-    .endif
-    cmp byte ptr [rsi+rcx-1], al
-    jne @3
-
-    sub rdi, r15
-    mov rax, rdi
-    jmp done
-@3:
-    mov r10, lptable        
-    mov r9d, dword ptr [r10+rax*4]
-    cmp r9d, edx			;test eax,edx		;<-first fault
-    cmove r9d, ecx
-    add rdi, r9
-    jmp try_again
-
-align 8
-done:
-    RestoreRegs        
-    ret
-
-Boyer_MooreIgn2 endp
-; max

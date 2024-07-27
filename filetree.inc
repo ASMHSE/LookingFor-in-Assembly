@@ -44,7 +44,7 @@ file_tree proc lpcb:QWORD, upatn:QWORD, uexcl:QWORD, flag:QWORD
         ANNOTATION use: pbuf buffer
     ENDIF
 
-    ANNOTATION use: lpcb upatn uexcl 
+    ANNOTATION use: lpcb upatn uexcl ; in file_core
 
     SaveRegs
 
@@ -97,15 +97,14 @@ cb_file_tree proc pfilename:QWORD, pwfd:QWORD, upatn:QWORD, uexcl:QWORD
     LOCAL buffer2[1024]:BYTE
     LOCAL buffer3[1024]:BYTE
 
-          IF TRACKING_CRASH 
-            conout "cb_file  -  " , pfilename, lf
-          ENDIF
-
+    IF TRACKING_CRASH 
+        conout "cb_file  -  " , pfilename, lf
+    ENDIF
 
   ; ----------------------
   ; don't list a directory
   ; ----------------------
-    cmp rv(GetFileAttributes,pfilename), FILE_ATTRIBUTE_DIRECTORY
+    test rv(GetFileAttributes,pfilename), FILE_ATTRIBUTE_DIRECTORY
     jne @F
     ret
   @@:

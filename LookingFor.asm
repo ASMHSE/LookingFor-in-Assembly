@@ -190,19 +190,32 @@ app_help endp
 
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 
+show_edit proc hwnd:HWND, lparam:LPARAM
+    mov lpfnEditProc, rv(SetWindowLongPtr,hwnd,GWL_WNDPROC,addr EditProc)
+    ret
+show_edit endp
+
+; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
+
 WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
 
     USING rbx, r12, r13, r14, r15
     LOCAL dfbuff[260]:BYTE
     LOCAL Rct: RECT, Rct1: RECT
     LOCAL sbh: DWORD, sbParts[2] :DWORD
-    LOCAL rct:RECT
+    LOCAL rct:RECT, units[2]:word, pt:POINT
 
     .switch uMsg
         .case WM_COMMAND
             .switch wParam
+                .case 201
+                    .if MasterLock == 0
+                        jmp run_now
+                    .endif    
+                    .return 0
                 .case 202
                     .if MasterLock == 0
+                      run_now:
                         invoke SendMessage, hbutton1, WM_SETTEXT, 0, ADDR but1_b
                         mov MasterLock, 1
                         invoke CreateThread, NULL, 0, addr app_run, 0, 0, NULL
@@ -218,7 +231,6 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                         invoke SendMessage, hStatus, SB_SETTEXT, 0, "Canceled!"
                     .endif    
                     .return 0
-
                 .case 203
                      invoke CreateThread, NULL, 0, addr app_help, hWin, 0, NULL
                     .return 0
@@ -237,7 +249,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                         invoke SendMessage,hedit1, CB_DELETESTRING,rax,0
                         SaveRegs
                         mov r15, ptr$(CurDir)
-                        lea r14, dfbuff
+                        ;lea r14, dfbuff
                         call SaveTargets
                         RestoreRegs
                         invoke PostMessage,HWND_BROADCAST,WM_TARGETSLISTCHANGE,0,0
@@ -251,7 +263,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                     invoke StoreTarget, addr dfbuff
                     SaveRegs
                     mov r15, ptr$(CurDir)
-                    lea r14, dfbuff
+                    ;lea r14, dfbuff
                     call SaveTargets
                     RestoreRegs
                     mov AddLock, 1
@@ -302,6 +314,10 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             mov lpListProc, rv(SetWindowLongPtr,hlist,GWL_WNDPROC,ADDR ListProc)
             mov lpfnIntProc, rv(SetWindowLongPtr,hedit5,GWL_WNDPROC,addr IntProc)
             mov lpfnDecProc, rv(SetWindowLongPtr,hedit6,GWL_WNDPROC,addr DecProc)
+            invoke SetWindowLongPtr,hedit2,GWL_WNDPROC,addr EditProc
+            invoke SetWindowLongPtr,hedit3,GWL_WNDPROC,addr EditProc
+            invoke SetWindowLongPtr,hedit4,GWL_WNDPROC,addr EditProc
+            invoke EnumChildWindows,hedit1,addr show_edit, 0
 
             invoke RetrieveTargets
             RRegEdit key2,opt01,empty,hedit1    

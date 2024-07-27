@@ -22,6 +22,7 @@
         lpListProc      dq ?
         lpfnDecProc     dq ?
         lpfnIntProc     dq ?
+        lpfnEditProc    dq ?
 
         hbutton1     dq ?
         hbutton2     dq ?
@@ -39,6 +40,7 @@
         hedit4       dq ?
         hedit5       dq ?
         hedit6       dq ?
+        hwndEdit1    dq ?
         hgbox1       dq ?
         hgbox2       dq ?
         hgbox1t      dq ?
