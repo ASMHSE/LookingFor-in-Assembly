@@ -109,11 +109,14 @@ AboutDlg proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
         ret
 
       .case WM_COMMAND
+       conout hex$(uMsg), " "
         .switch wParam
           .case 102                     ; the OK button
             jmp exit_dialog
+          .case IDCANCEL
+            mov EscapeLock, 1
+            jmp exit_dialog
         .endsw
-
       .case WM_CLOSE
         exit_dialog:
         invoke EndDialog,hWin,0         ; exit from system menu

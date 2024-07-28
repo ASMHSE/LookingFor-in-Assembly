@@ -44,6 +44,7 @@ ListProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             fn szCmp, indx, "exe"
             test eax, eax
             jz @F
+            mov EscapeLock, 1
             invoke MessageBox, hWin, "Binaries will not run from here", addr caption, MB_OK
             .return 0
 @@:
@@ -94,7 +95,8 @@ result:
                 .else
                     lea rdx, err0
                 .endif
-        	  invoke  MessageBox, hWin, rdx, addr caption, MB_OK
+                mov EscapeLock, 1
+        	  invoke MessageBox, hWin, rdx, addr caption, MB_OK
             .endif
             .return 0
     .endsw

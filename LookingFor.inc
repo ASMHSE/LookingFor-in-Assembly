@@ -131,6 +131,7 @@
         MasterLock  dq 0
         EscapeLock  dq 0
         AddLock     dq 0
+        DialogLock  dq 0
 
         criterios   dq 0
         psearch1    dq 0

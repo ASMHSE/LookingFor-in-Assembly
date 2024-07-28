@@ -11,7 +11,7 @@ TheTarget ends
 .code
 
 
-CleanItems proc ; pbase:qword
+CleanItems proc pbase:qword
     USING rbx, r12
     SaveRegs
 
@@ -73,7 +73,6 @@ RemoveTarget endp
 
 RetrieveTarget proc target:qword
     USING rbx, r12
-    ANNOTATION prv: r13 ; in RetrieveTargets 
     SaveRegs
 
     mov rbx, TheTargets
@@ -119,7 +118,6 @@ StoreTarget proc target:qword
         invoke szCmp, rcx, target
         cmp rax, 0
         jne quit
-        conout str$(rax),lf 
         mov rbx, [rbx].TheTarget.thenext
         cmp rbx, 0
         jne loop1

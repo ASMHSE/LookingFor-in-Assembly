@@ -103,6 +103,7 @@ app_run proc
     mov al, [rcx]
     .if al == 0
         mcat addr buffer3, "Path target problem"
+        mov EscapeLock, 1
         invoke MessageBox,0, addr buffer3, addr caption,MB_OK
         invoke SendMessage, hStatus, SB_SETTEXT, 0, addr sb_msg_1
         jmp app_out
@@ -117,6 +118,7 @@ app_run proc
     lea rcx, searchname
     mov al, [rcx]
     .if al == 0
+        mov EscapeLock, 1
         mcat addr buffer3, "Name or extension target problem:", \
             lf, lf, tab, "Target Path is:",lf, tab, addr searchcall, \
             lf, lf, tab, "Target Mask is empty"
@@ -229,6 +231,7 @@ app_run proc
         .else
             mcat addr buffer3, "Fail to set Target Path:",lf,lf, tab, addr searchpath
         .endif
+        mov EscapeLock, 1
         invoke MessageBox, 0, addr buffer3, addr caption,MB_OK
         invoke SendMessage,hStatus,SB_SETTEXT,0,"looking for..."
         jmp app_out

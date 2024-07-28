@@ -9,7 +9,8 @@
                 ;lea rax, wfd.cFileName
                 ;conout "dir = ", rax, lf
               ENDIF
-                    invoke MessageBox,0, "Fail to set directory", addr caption,MB_OK
+                mov EscapeLock, 1
+                invoke MessageBox,0, "Fail to set directory", addr caption, MB_OK
                 jmp close_file
             .endif
             invoke file_tree,lpcb,upatn,uexcl,flag    ; recurse to next directory level
@@ -23,11 +24,11 @@
         invoke szLen, addr wfd.cFileName
         .if rax { MAX_PATH
             invoke lpcb, addr wfd.cFileName, addr wfd, upatn, uexcl
-
         .else
           IF TRACKING_CRASH 
             conout "to deep",lf
           ENDIF
+            mov EscapeLock, 1
             invoke MessageBox,0, "Path to deep to open filey", addr caption,MB_OK
         .endif
     endm
@@ -44,7 +45,7 @@ file_tree proc lpcb:QWORD, upatn:QWORD, uexcl:QWORD, flag:QWORD
         ANNOTATION use: pbuf buffer
     ENDIF
 
-    ANNOTATION use: lpcb upatn uexcl ; in file_core
+    ANNOTATION use: lpcb upatn uexcl 
 
     SaveRegs
 
@@ -97,14 +98,15 @@ cb_file_tree proc pfilename:QWORD, pwfd:QWORD, upatn:QWORD, uexcl:QWORD
     LOCAL buffer2[1024]:BYTE
     LOCAL buffer3[1024]:BYTE
 
-    IF TRACKING_CRASH 
-        conout "cb_file  -  " , pfilename, lf
-    ENDIF
+          IF TRACKING_CRASH 
+            conout "cb_file  -  " , pfilename, lf
+          ENDIF
+
 
   ; ----------------------
   ; don't list a directory
   ; ----------------------
-    test rv(GetFileAttributes,pfilename), FILE_ATTRIBUTE_DIRECTORY
+    cmp rv(GetFileAttributes,pfilename), FILE_ATTRIBUTE_DIRECTORY
     jne @F
     ret
   @@:

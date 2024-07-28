@@ -159,11 +159,14 @@ msgloop proc
             .switch msg.wParam
               .case VK_ESCAPE
                 .if EscapeLock } 0
-                    dec EscapeLock
+                    mov EscapeLock, 0
                 .else
                     rcall SendMessage,hWnd,WM_CLOSE,0,0
                 .endif
-
+              .case VK_RETURN
+                .if EscapeLock } 0
+                    mov EscapeLock, 0
+                .endif
             .endsw
     .endsw
     invoke IsDialogMessage, hWnd, pmsg    
@@ -183,6 +186,7 @@ msgloop endp
 app_help proc hWin:QWORD
     invoke ShellExecute, hWin, "open", pHelp, 0, 0, SW_RESTORE
     .if eax {= 32
+        mov EscapeLock, 1 
         invoke  MessageBox, hWin, "Could not open LookingFor.pdf", "LookingFor:", MB_OK
     .endif
     ret
@@ -236,7 +240,9 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                     .return 0
 
                 .case 204
+                     mov DialogLock, 1
 	              invoke DialogBoxParam, hInstance, 100, hWin, ADDR AboutDlg, 0
+                     mov DialogLock, 0
                     .return 0
 
                 .case 206
@@ -244,7 +250,8 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                     invoke RemoveTarget,addr dfbuff
                     invoke SendMessage,hedit1,CB_FINDSTRINGEXACT,-1,addr dfbuff
                     .if rax == CB_ERR
-                        invoke MessageBox,hWnd,"Target is not listed","LookinFor",MB_OK
+                        mov EscapeLock, 1
+                        invoke MessageBox,hWnd,"Target is not listed","LookingFor", MB_OK
                     .else
                         invoke SendMessage,hedit1, CB_DELETESTRING,rax,0
                         SaveRegs
