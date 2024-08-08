@@ -44,7 +44,7 @@ ListProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             fn szCmp, indx, "exe"
             test eax, eax
             jz @F
-            mov EscapeLock, 1
+            
             invoke MessageBox, hWin, "Binaries will not run from here", addr caption, MB_OK
             .return 0
 @@:
@@ -404,7 +404,7 @@ endm
 
 SaveTargets proc
     USING rbx, r12, r13
-    ANNOTATION prv: r15
+    ANNOTATION prv: r15 ; in app_run
     LOCAL opcion[8]:byte
 
     SaveRegs

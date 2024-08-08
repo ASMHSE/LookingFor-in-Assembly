@@ -168,6 +168,14 @@ msgloop proc
                     mov EscapeLock, 0
                 .endif
             .endsw
+
+          .case WM_KEYDOWN
+            .switch msg.wParam
+              .case VK_SPACE
+                .if EscapeLock } 0
+                    mov EscapeLock, 0
+                .endif
+            .endsw
     .endsw
     invoke IsDialogMessage, hWnd, pmsg    
     .if rax == 0

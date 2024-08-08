@@ -35,7 +35,7 @@ chargep endp
 SelectionMount proc pchain:QWORD, cadena:QWORD
     USING rbx,rsi,rdi,r12
     LOCAL extension[128]:byte
-    ANNOTATION use: rbx r12 ; in chargep
+    ANNOTATION use: rbx r12 ; rdi in chargep
     SaveRegs
 
     mov useExcl, 0
@@ -78,8 +78,7 @@ SelectionMount endp
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 
 app_run proc
-    LOCAL pbuf  :QWORD, pbuf4 :QWORD
-    LOCAL pcmd  :QWORD, lgral1:REAL8
+    LOCAL pbuf  :QWORD, lgral1:REAL8
 
     LOCAL buffer0[260]:BYTE
     LOCAL buffer1[260]:BYTE

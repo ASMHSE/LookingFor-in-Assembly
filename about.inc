@@ -109,7 +109,6 @@ AboutDlg proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
         ret
 
       .case WM_COMMAND
-       conout hex$(uMsg), " "
         .switch wParam
           .case 102                     ; the OK button
             jmp exit_dialog
