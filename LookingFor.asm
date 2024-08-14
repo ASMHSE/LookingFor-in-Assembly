@@ -346,6 +346,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             RRegMode key2,opt09,unidad,hcb3    
             RRegMode key2,opt10,naranja,hcb4    
             invoke RetrieveAssoc
+            RRegSize key5,opt0001,naranja,point_separator
             invoke SetFocus, hbutton1		
 
             .return 0
@@ -489,6 +490,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             WRegMode key2,opt09,hcb3    
             WRegMode key2,opt10,hcb4    
             call SaveTargets
+            WRegSize key5,opt0001,point_separator
             RestoreRegs
             invoke SendMessage,hWin,WM_DESTROY,0,0
 

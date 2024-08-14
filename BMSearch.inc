@@ -2,61 +2,68 @@
     bad_chars1 dd 256 dup (?)
     bad_chars2 dd 256 dup (?)
 .data
-    ParseChars db  ' ',',','.','|','*','<','>','"','=','(',')','{','}','[',']','^','+','-',':','/','&','!','\','%',13,10,9,"_" 
+    ParseChars db  ' ',',','|','*','<','>','"','=','(',')','{','}','[',']','^','+','-',':','/','&','!','\','%',13,10,9,"_" 
 
     $numParseChars EQU $ - ParseChars
 .code
+
+    check_full_core macro stringword, nosepm
+        mov al, [r15+r12]
+        .if al == 2Eh
+            .if point_separator == 0
+                lea rdi, ParseChars
+                mov al, [r15+r12-1]
+                mov rcx, $numParseChars-1
+                REPNE SCASB
+                jne nosepm
+                jmp loop1
+            .else
+                 jmp nosepm
+            .endif
+        .endif
+        lea rdi, ParseChars
+        .if &stringword == 1
+            mov rcx, $numParseChars-1
+            REPNE SCASB
+            je nosepm
+            jmp loop1
+        .elseif &stringword == 2
+            mov rcx, $numParseChars
+            REPNE SCASB
+            je nosepm
+            jmp loop1
+    endm
 
     check_full macro stringword, dSize
         local nosepi
         local nosepf
 
-    .if &stringword } 0
-      ;  mov r13,rax
-      ;  conout " check rcx = ", str$(rcx),lf
-      ;  conout " check rax = ", str$(r13),lf
-      ;  mov rax, r13
-        mov r12, rax
-        .if rax == 0
-            jmp nosepi
+        .if &stringword } 0
+          ;  mov r13,rax
+          ;  conout " check rcx = ", str$(rcx),lf
+          ;  conout " check rax = ", str$(r13),lf
+          ;  mov rax, r13
+    
+            mov r12, rax
+    
+            .if rax == 0
+                jmp nosepi
+            .endif
+            xor eax, eax
+            dec r12
+            check_full_core &stringword, nosepi
+           nosepi:
+            .endif
+    
+            add r12d, &dSize
+            add r12, 1
+            .if r12 } r14
+                jmp nosepf
+            .endif 
+            check_full_core &stringword, nosepf
+           nosepf:
+            .endif
         .endif
-        xor eax, eax
-        dec r12
-        mov al, [r15+r12]
-        lea rdi, ParseChars
-        .if &stringword == 1
-            mov rcx, $numParseChars-1
-            REPNE SCASB
-            je nosepi
-            jmp loop1
-        .elseif &stringword == 2
-            mov rcx, $numParseChars
-            REPNE SCASB
-            je nosepi
-            jmp loop1
-       nosepi:
-        .endif
-
-        add r12d, &dSize
-        add r12, 1
-        .if r12 } r14
-            jmp nosepf
-        .endif 
-        mov al, [r15+r12]
-        lea rdi, ParseChars
-        .if &stringword == 1
-            mov rcx, $numParseChars-1
-            REPNE SCASB
-            je nosepf
-            jmp loop1
-        .elseif &stringword == 2
-            mov rcx, $numParseChars
-            REPNE SCASB
-            je nosepf
-            jmp loop1
-       nosepf:
-        .endif
-    .endif
     endm
 
 ; ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
@@ -74,7 +81,7 @@ Boyer_Moore_Search proc pfilename : QWORD
     LOCAL pos2           :DWORD		;initial position second criterium
     LOCAL return_value2  :DWORD		;return result in eax register
     LOCAL storedsize1    :DWORD
-	
+    	
     SaveRegs
     
     invoke GetStdHandle,STD_OUTPUT_HANDLE
