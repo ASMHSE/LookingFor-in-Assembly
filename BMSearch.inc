@@ -2,35 +2,23 @@
     bad_chars1 dd 256 dup (?)
     bad_chars2 dd 256 dup (?)
 .data
-    ParseChars db  ' ',',','|','*','<','>','"','=','(',')','{','}','[',']','^','+','-',':','/','&','!','\','%',13,10,9,"_" 
+    ParseChars db  ' ',',','|','*','"','=','^','+','-',':','/','&','!','\','%',13,10,9,'(',')','{','}','[',']','<','>','.',"_" 
 
     $numParseChars EQU $ - ParseChars
 .code
 
     check_full_core macro stringword, nosepm
         mov al, [r15+r12]
-        .if al == 2Eh
-            .if point_separator == 0
-                lea rdi, ParseChars
-                mov al, [r15+r12-1]
-                mov rcx, $numParseChars-1
-                REPNE SCASB
-                jne nosepm
-                jmp loop1
-            .else
-                 jmp nosepm
-            .endif
-        .endif
         lea rdi, ParseChars
         .if &stringword == 1
             mov rcx, $numParseChars-1
             REPNE SCASB
-            je nosepm
+            je &nosepm
             jmp loop1
         .elseif &stringword == 2
             mov rcx, $numParseChars
             REPNE SCASB
-            je nosepm
+            je &nosepm
             jmp loop1
     endm
 
@@ -50,6 +38,22 @@
                 jmp nosepi
             .endif
             xor eax, eax
+
+            mov al, [r15+r12]
+            .if al == 2Eh
+                .if point_separator == 0
+                    lea rdi, ParseChars
+                    mov al, [r15+r12-1]
+                    mov rcx, $numParseChars-10
+                    REPNE SCASB
+                    je nosepi
+                    jmp loop1
+                .else
+                    jmp nosepi
+                .endif
+            .endif
+
+
             dec r12
             check_full_core &stringword, nosepi
            nosepi:
