@@ -15,6 +15,11 @@
     TRACKING_CRASH equ 0
 ;    TRACKING_CRASH equ 1       ; Also need to be linked like CONSOLE
 
+test2 struct
+    .left qword 0
+test2 ends
+
+    test3 test2 {2}
     .code
 
     include BMSearch.inc        
@@ -29,6 +34,14 @@
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 
 entry_point proc
+
+conout str$(test3..left),lf
+
+mov test3..left, 1
+
+conout str$(test3..left),lf
+
+    
 
     GdiPlusBegin                    ; initialise GDIPlus
 
@@ -318,11 +331,11 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             mov hcb1, rv(select_combo,hInstance,hWin, 0,0,0,00,211)
             fill_cb hcb1, string1case, 0, "sens.", "insens.", "ignore"
             mov hcb2, rv(select_combo,hInstance,hWin, 0,0,0,0,212)
-            fill_cb hcb2, string1word, 0, "partial", "full", "+underscore"
+            fill_cb hcb2, string1word, 0, "partial", "full", "+underscore","+point"
             mov hcb3, rv(select_combo,hInstance,hWin, 0,0,0,0,213)
             fill_cb hcb3, string2case, 0, "sens.", "insens.", "ignore"
             mov hcb4, rv(select_combo,hInstance,hWin, 0,0,0,0,214)
-            fill_cb hcb4, string2word, 0, "partial", "full", "+underscore"
+            fill_cb hcb4, string2word, 0, "partial", "full", "+underscore","+point"
           
             mov hlist, rv(list,hInstance,hWin, 0,0,0,0,700)
 
@@ -346,7 +359,6 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             RRegMode key2,opt09,unidad,hcb3    
             RRegMode key2,opt10,naranja,hcb4    
             invoke RetrieveAssoc
-            RRegSize key5,opt0001,naranja,point_separator
             invoke SetFocus, hbutton1		
 
             .return 0
@@ -490,7 +502,6 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             WRegMode key2,opt09,hcb3    
             WRegMode key2,opt10,hcb4    
             call SaveTargets
-            WRegSize key5,opt0001,point_separator
             RestoreRegs
             invoke SendMessage,hWin,WM_DESTROY,0,0
 

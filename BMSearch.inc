@@ -2,7 +2,7 @@
     bad_chars1 dd 256 dup (?)
     bad_chars2 dd 256 dup (?)
 .data
-    ParseChars db  ' ',',','|','*','"','=','^','+','-',':','/','&','!','\','%',13,10,9,'(',')','{','}','[',']','<','>','.',"_" 
+    ParseChars db  '.',' ',',','|','*','"','=','^','+','-',':','/','&','!','\','%',13,10,9,'(',')','{','}','[',']','<','>',"_" 
 
     $numParseChars EQU $ - ParseChars
 .code
@@ -20,7 +20,7 @@
             REPNE SCASB
             je &nosepm
             jmp loop1
-    endm
+      endm
 
     check_full macro stringword, dSize
         local nosepi
@@ -41,22 +41,26 @@
 
             mov al, [r15+r12]
             .if al == 2Eh
-                .if point_separator == 0
+                .if &stringword == 1
                     lea rdi, ParseChars
                     mov al, [r15+r12-1]
-                    mov rcx, $numParseChars-10
+                    mov rcx, $numParseChars-9
                     REPNE SCASB
                     je nosepi
                     jmp loop1
-                .else
-                    jmp nosepi
                 .endif
             .endif
 
-
             dec r12
             check_full_core &stringword, nosepi
-           nosepi:
+            .elseif &stringword == 3
+                mov point, 0
+                .if al == 2Eh
+                    inc point
+                    jmp nosepi
+                .endif
+                jmp loop1
+         nosepi:
             .endif
     
             add r12d, &dSize
@@ -65,6 +69,14 @@
                 jmp nosepf
             .endif 
             check_full_core &stringword, nosepf
+            .elseif &stringword == 3
+                .if al == 2Eh
+                    inc point
+                .endif
+                .if point } 0
+                    jmp nosepf
+                .endif
+                jmp loop1
            nosepf:
             .endif
         .endif
@@ -80,6 +92,7 @@ Boyer_Moore_Search proc pfilename : QWORD
     LOCAL saida          :QWORD		;output handle
     LOCAL arquivo        :QWORD		;file handle
     LOCAL arqmap         :QWORD
+    LOCAL point          :QWORD
     LOCAL pos            :DWORD		;initial position first criterium
     LOCAL return_value   :DWORD		;return result in eax register
     LOCAL pos2           :DWORD		;initial position second criterium

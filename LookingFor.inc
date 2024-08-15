@@ -96,8 +96,8 @@
             opt001  db "bat",0
             opt002  db "cmd",0
             opt003  db "js",0
-        key5        db "Options",0
-            opt0001 db "point",0
+        ;key5        db "Options",0
+        ;    opt0001 db "point",0
 
         naranja     db "0",0
         unidad      db "1",0
@@ -111,7 +111,6 @@
         Boyer_Moore_Table   dq  0
         Boyer_Moore1        dq  0
         Boyer_Moore2        dq  0
-        point_separator     dq  0 
 
         CurDir      db  260 dup(0)
         szBuff      db  256 dup(0)
