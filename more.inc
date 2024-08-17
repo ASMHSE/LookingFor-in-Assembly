@@ -295,7 +295,7 @@ static endp
 buttonp proc instance:QWORD,hparent:QWORD,text:QWORD,topx:QWORD,topy:QWORD,wid:QWORD,hgt:QWORD,idnum:QWORD
 
     invoke CreateWindowEx,WS_EX_LEFT,"BUTTON",text, \
-                          WS_CHILD or WS_VISIBLE or WS_TABSTOP,\
+                          WS_CHILD or WS_VISIBLE or WS_TABSTOP or WS_CLIPSIBLINGS	,\
                           topx,topy,wid,hgt,hparent,idnum,instance,0
     
     ret

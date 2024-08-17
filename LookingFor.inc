@@ -68,7 +68,7 @@
         ghgt         dq 0
 
         classname   db "lookingfor_class",0
-        caption     db "LookingFor",0
+        caption     db "LookingFor 1.9 again",0
         but1_a      db "Find",0
         but1_b      db "Cancel",0
 
@@ -143,7 +143,7 @@
         WM_TARGETSLISTCHANGE    dq 0
         WM_EXTASSOCIATIONCHANGE dq 0
 
-        default_editor db "\masm64\qeditor", 0
+        default_editor db "\masm64\qeditor1", 0
 
         err0  db "Could not open",0
         err1  db "There is no application associated",13,10,\

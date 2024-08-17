@@ -17,8 +17,8 @@
 // *************************************************************************************************
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION 1, 0, 0, 0
-PRODUCTVERSION 1, 0, 0, 0
+FILEVERSION 1, 9, 0, 0
+PRODUCTVERSION 1, 9, 0, 0
 FILEOS VOS__WINDOWS32
 FILETYPE VFT_APP
 BEGIN
@@ -28,12 +28,12 @@ BEGIN
     BEGIN
       VALUE "CompanyName",      "The MASM64 SDK\000"
       VALUE "FileDescription",  "Search items in file system\000"
-      VALUE "FileVersion",      "1.0\000"
+      VALUE "FileVersion",      "1.9\000"
       VALUE "InternalName",     "LookingFor\000"
       VALUE "OriginalFilename", "LookingFor.exe\000"
       VALUE "LegalCopyright",   "\251 2024 The MASM64 SDK\000"
       VALUE "ProductName",      "LookingFor\000"
-      VALUE "ProductVersion",   "1.0\000"
+      VALUE "ProductVersion",   "1.9\000"
     END
   END
   BLOCK "VarFileInfo"

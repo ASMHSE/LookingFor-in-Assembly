@@ -30,7 +30,7 @@ AboutDlg proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
     ; «»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»«»
 
       .data
-        tmsg db "LookingFor © Copyright 2024",13,10
+        tmsg db @CatStr(<!"LookingFor >,%LFversion,< © Copyright 2024!">),13,10
              db "The MASM64 SDK All Rights Reserved.",13,10
              db "A simple tool to search expressions in files.",13,10,13,10
              db "The operating system reports...",0
@@ -51,8 +51,9 @@ AboutDlg proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
         invoke Get_Vendor,vendor
 
         mov cpustr, ptr$(cpubuf)
-        invoke get_cpu_id_string,cpustr
-
+        invoke get_cpu_id_string,pbuff
+        invoke szLtrim,pbuff,cpustr
+        
         mov mse.dwLength, SIZEOF MEMORYSTATUSEX                 ; initialise length
         invoke GlobalMemoryStatusEx,ADDR mse                    ; call API
 
