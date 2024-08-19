@@ -9,7 +9,7 @@
 ;    AllowPromotions equ 1
 ;    include macros64G3.inc
 
-    LFversion textequ <1.9>
+    LFversion textequ <1.9b>
     include LookingFor.inc
 
     ;   For cleanning disk and possible bugs test use 1 
@@ -227,8 +227,8 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
 
     USING rbx, r12, r13, r14, r15
     LOCAL dfbuff[260]:BYTE
-    LOCAL Rct: RECT, Rct1: RECT
-    LOCAL sbh: DWORD, sbParts[2] :DWORD
+    LOCAL Rct: RECT, Rct1: RECT, hdc:QWORD
+    LOCAL sbh: DWORD, sbParts[2] :DWORD, widths
     LOCAL rct:RECT, units[2]:word, pt:POINT
 
     .switch uMsg
@@ -311,7 +311,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             mov hbutton4, rv(buttonp,hInstance,hWin," - ",0,0,22,24,1206)
             mov hbutton5, rv(buttonp,hInstance,hWin," + ",0,0,22,24,1207)
 
-            mov hstatic1, rv(static,hInstance,hWin,"Base directory and files:",0,0,0,0)
+            mov hstatic1, rv(static2,hInstance,hWin,"Base directory and files:",0,0,0,0)
             mov hstatic2, rv(staticr,hInstance,hWin,"excluded:  ",0,0,0,0)
             
             mov hstatic3, rv(staticr,hInstance,hWin,"maxDist:  ",0,0,0,0)
@@ -382,101 +382,114 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             .endif
             .return 0
 
+        .elseif eax == WM_GETMINMAXINFO
+            invoke GetDC, hWin
+            mov hdc, rax
+            invoke GetCharWidth32, hdc, 77, 77, addr widths;sbParts
+            invoke ReleaseDC, hdc
+            mov eax, widths
+            mov ecx, 30
+            mul ecx
+            mov     rdx,lParam
+            mov     [rdx].MINMAXINFO.ptMinTrackSize.x, eax
+            mov     [rdx].MINMAXINFO.ptMinTrackSize.y, eax
+            xor     eax,eax
+    
         .case WM_SIZE
-                SaveRegs
-                invoke GetClientRect,hWin,ADDR Rct
-                mov ebx, Rct.right
-                shr rbx, 1
-                mov sbParts, ebx
+            SaveRegs
+            invoke GetClientRect,hWin,ADDR Rct
+            mov ebx, Rct.right
+            shr rbx, 1
+            mov sbParts, ebx
+
+            invoke MoveWindow,hStatus,0,0,0,0,TRUE
+            ;invoke SendMessage, hStatus, SB_SETPARTS, 2, ADDR sbParts
+
+            invoke GetClientRect,hStatus,ADDR Rct1
+            mov eax, Rct1.bottom
+            mov sbh, eax      ; status bar height
+            mov rax, rbx
+            sub rax, 6
+            invoke MoveWindow, hstatic1, 3, 3, rax, 22,TRUE
+            invoke SendMessage,hstatic1, BN_PAINT,0,0
+            mov rax, rbx
+            mov rcx, 3
+            div rcx
+            mov r12, rax
+            sub r12, 3
+
+            invoke MoveWindow, hbutton1,rbx,3,r12,22,TRUE
+            add rbx, r12
+            add rbx, 3
+            invoke MoveWindow, hbutton2,rbx,3,r12,22,TRUE
+            add rbx, r12
+            add rbx, 3
+            
+            mov eax, Rct.right
+            sub rax, rbx 
+            sub rax, 3
+            invoke MoveWindow, hbutton3,rbx,3,rax,22,TRUE
+
+            mov r15d, Rct.right
+            sub r15, 6
+            mov r14, r15
+            sub r14, 57 
+            mov eax, Rct.bottom
+            invoke MoveWindow, hedit1,3,33,r14,rax,TRUE
+            add r14, 6
+            invoke MoveWindow, hbutton4,r14,33,24,24,TRUE
+            add r14, 27
+            invoke MoveWindow, hbutton5,r14,33,24,24,TRUE
+
+            invoke MoveWindow, hgbox1,3,63,r15,57,TRUE
+            invoke MoveWindow, hgbox2,3,123,r15,57,TRUE
+            invoke MoveWindow, hgbox1t,13,62,127,15,TRUE
+            invoke MoveWindow, hgbox2t,13,122,140,15,TRUE
+            invoke SendMessage,hgbox1t, BN_PAINT,0,0
+            invoke SendMessage,hgbox2t, BN_PAINT,0,0
+
+            sub r15, 176
+            invoke MoveWindow, hedit2,9,85,r15,24,TRUE
+            invoke MoveWindow, hedit3,9,145,r15,24,TRUE
+            add r15, 13
+            invoke MoveWindow, hcb1,r15,85,77,95,TRUE
+            invoke MoveWindow, hcb3,r15,145,77,95,TRUE
+            add r15, 80
+            invoke MoveWindow, hcb2,r15,85,77,95,TRUE
+            invoke MoveWindow, hcb4,r15,145,77,95,TRUE
+
+            mov eax, Rct.right
+            mov rcx, 6
+            div rcx
+            mov r12, rax
+            mov r13, rax
+            mov rbx, rax
+            sub r12, 3
+
+            invoke MoveWindow, hstatic2,3,183,r12,22,TRUE
+            invoke SendMessage,hstatic2, BN_PAINT,0,0
+            invoke MoveWindow, hedit4,rbx,183,r12,22,TRUE
+            add rbx, r13
+            invoke MoveWindow, hstatic3,rbx,183,r12,22,TRUE
+            invoke SendMessage,hstatic3, BN_PAINT,0,0
+            add rbx, r13
+            invoke MoveWindow, hedit5,rbx,183,r12,22,TRUE
+            add rbx, r13
+            invoke MoveWindow, hstatic4,rbx,183,r12,22,TRUE
+            invoke SendMessage,hstatic4, BN_PAINT,0,0
+            add rbx, r13
+            mov eax, Rct.right
+            sub rax, rbx 
+            sub rax, 3
+            invoke MoveWindow, hedit6,rbx,183,rax,22,TRUE
+            mov eax, Rct.bottom
+            sub eax, sbh
+            sub rax, 213
+            add r15, 176-93
+            invoke MoveWindow, hlist, 3, 210, r15,rax,TRUE
     
-                invoke MoveWindow,hStatus,0,0,0,0,TRUE
-                ;invoke SendMessage, hStatus, SB_SETPARTS, 2, ADDR sbParts
-    
-                invoke GetClientRect,hStatus,ADDR Rct1
-                mov eax, Rct1.bottom
-                mov sbh, eax      ; status bar height
-                mov rax, rbx
-                sub rax, 6
-                invoke MoveWindow, hstatic1, 3, 3, rax, 22,TRUE
-                invoke SendMessage,hstatic1, BN_PAINT,0,0
-                mov rax, rbx
-                mov rcx, 3
-                div rcx
-                mov r12, rax
-                sub r12, 3
-    
-                invoke MoveWindow, hbutton1,rbx,3,r12,22,TRUE
-                add rbx, r12
-                add rbx, 3
-                invoke MoveWindow, hbutton2,rbx,3,r12,22,TRUE
-                add rbx, r12
-                add rbx, 3
-                
-                mov eax, Rct.right
-                sub rax, rbx 
-                sub rax, 3
-                invoke MoveWindow, hbutton3,rbx,3,rax,22,TRUE
-    
-                mov r15d, Rct.right
-                sub r15, 6
-                mov r14, r15
-                sub r14, 57 
-                mov eax, Rct.bottom
-                invoke MoveWindow, hedit1,3,33,r14,rax,TRUE
-                add r14, 6
-                invoke MoveWindow, hbutton4,r14,33,24,24,TRUE
-                add r14, 27
-                invoke MoveWindow, hbutton5,r14,33,24,24,TRUE
-    
-                invoke MoveWindow, hgbox1,3,63,r15,57,TRUE
-                invoke MoveWindow, hgbox2,3,123,r15,57,TRUE
-                invoke MoveWindow, hgbox1t,13,62,127,15,TRUE
-                invoke MoveWindow, hgbox2t,13,122,140,15,TRUE
-                invoke SendMessage,hgbox1t, BN_PAINT,0,0
-                invoke SendMessage,hgbox2t, BN_PAINT,0,0
-    
-                sub r15, 176
-                invoke MoveWindow, hedit2,9,85,r15,24,TRUE
-                invoke MoveWindow, hedit3,9,145,r15,24,TRUE
-                add r15, 13
-                invoke MoveWindow, hcb1,r15,85,77,95,TRUE
-                invoke MoveWindow, hcb3,r15,145,77,95,TRUE
-                add r15, 80
-                invoke MoveWindow, hcb2,r15,85,77,95,TRUE
-                invoke MoveWindow, hcb4,r15,145,77,95,TRUE
-    
-                mov eax, Rct.right
-                mov rcx, 6
-                div rcx
-                mov r12, rax
-                mov r13, rax
-                mov rbx, rax
-                sub r12, 3
-    
-                invoke MoveWindow, hstatic2,3,183,r12,22,TRUE
-                invoke SendMessage,hstatic2, BN_PAINT,0,0
-                invoke MoveWindow, hedit4,rbx,183,r12,22,TRUE
-                add rbx, r13
-                invoke MoveWindow, hstatic3,rbx,183,r12,22,TRUE
-                invoke SendMessage,hstatic3, BN_PAINT,0,0
-                add rbx, r13
-                invoke MoveWindow, hedit5,rbx,183,r12,22,TRUE
-                add rbx, r13
-                invoke MoveWindow, hstatic4,rbx,183,r12,22,TRUE
-                invoke SendMessage,hstatic4, BN_PAINT,0,0
-                add rbx, r13
-                mov eax, Rct.right
-                sub rax, rbx 
-                sub rax, 3
-                invoke MoveWindow, hedit6,rbx,183,rax,22,TRUE
-                mov eax, Rct.bottom
-                sub eax, sbh
-                sub rax, 213
-                add r15, 176-93
-                invoke MoveWindow, hlist, 3, 210, r15,rax,TRUE
-        
-                RestoreRegs
-                .return 0
+            RestoreRegs
+            
         .case WM_CLOSE
             
             invoke GetWindowRect, hWin, addr rct

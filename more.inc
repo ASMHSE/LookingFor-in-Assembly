@@ -289,6 +289,14 @@ static proc instance:QWORD,hparent:QWORD,text:QWORD,topx:QWORD,topy:QWORD,wid:QW
     ret
 
 static endp
+static2 proc instance:QWORD,hparent:QWORD,text:QWORD,topx:QWORD,topy:QWORD,wid:QWORD,hgt:QWORD
+
+    invoke CreateWindowEx,WS_EX_LEFT,"STATIC",text, \
+                          WS_CHILD or WS_VISIBLE or WS_CLIPSIBLINGS or SS_SIMPLE	,\
+                          topx,topy,wid,hgt,hparent,-1,instance,0
+    ret
+
+static2 endp
 
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 

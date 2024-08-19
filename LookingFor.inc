@@ -68,7 +68,7 @@
         ghgt         dq 0
 
         classname   db "lookingfor_class",0
-        caption     db "LookingFor 1.9 again",0
+        caption     db @CatStr(<!"LookingFor >,%LFversion,<!">),0
         but1_a      db "Find",0
         but1_b      db "Cancel",0
 
@@ -197,4 +197,12 @@
 
     ANNOTATION macro vars:vararg
     endm
+
+ MINMAXINFO struct
+   ptReserved      POINT {?} 
+   ptMaxSize       POINT {?}
+   ptMaxPosition   POINT {?}
+   ptMinTrackSize  POINT {?}
+   ptMaxTrackSize  POINT {?}
+ MINMAXINFO ends
     
