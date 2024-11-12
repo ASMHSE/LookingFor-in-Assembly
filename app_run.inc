@@ -1,3 +1,4 @@
+
 TheItem struct
     thenext     dq  0
     thestring   dq  0    
@@ -232,7 +233,7 @@ app_run proc
         .endif
         mov EscapeLock, 1
         invoke MessageBox, 0, addr buffer3, addr caption,MB_OK
-        invoke SendMessage,hStatus,SB_SETTEXT,0,"looking for..."
+        invoke SendMessage,hStatus,0,0,"looking for..."
         jmp app_out
     .endif
 

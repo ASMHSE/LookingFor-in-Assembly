@@ -70,12 +70,20 @@ ListProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             invoke ShellExecute, hWin, 0, addr EditorJs, pbuf, 0, SW_RESTORE
             jmp result
 @@:
+            fn szCmp, indx, "sh"
+            
+            test eax, eax
+            jz @F
+            mov prevented, 1
+            invoke ShellExecute, hWin, 0, addr EditorBat, pbuf, 0, SW_RESTORE
+            jmp result
+@@:
             mov prevented, 0
 
             invoke ShellExecute, hWin, "open", pbuf, 0, 0, SW_RESTORE
 result:
             .if eax {= 32
-                .if eax == SE_ERR_NOASSOC	
+                .if eax == SE_ERR_NOASSOC    
                     lea rdx, err1
                 .elseif eax == ERROR_FILE_NOT_FOUND
                     .if prevented == 0
@@ -83,7 +91,7 @@ result:
                     .else
                         if 0
                         SaveRegs
-                        lea r13, buffer0	
+                        lea r13, buffer0    
                         mcat r13, addr err3, addr default_editor
                         mov rdx, r13
                         RestoreRegs
@@ -96,7 +104,7 @@ result:
                     lea rdx, err0
                 .endif
                 mov EscapeLock, 1
-        	  invoke MessageBox, hWin, rdx, addr caption, MB_OK
+              invoke MessageBox, hWin, rdx, addr caption, MB_OK
             .endif
             .return 0
     .endsw
@@ -160,7 +168,7 @@ DecProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             invoke CallWindowProc, lpfnDecProc, hWin, WM_GETTEXT, lengthof cBuffer, addr cBuffer
    
             mov ecx, lengthof cBuffer       ; byte count in rcx
-		   
+           
             lea rsi, cBuffer                ; address in rsi
           @xxx:
                 lodsb                       ; load byte into al
@@ -231,7 +239,7 @@ list proc instance:QWORD,parent:QWORD,topx:QWORD, \
 
     invoke CreateWindowEx,WS_EX_LEFT,"LISTBOX",0, \
                   WS_CHILD or WS_VISIBLE or WS_EX_RIGHTSCROLLBAR or WS_VSCROLL or \
-                  LBS_HASSTRINGS or LBS_NOTIFY or WS_TABSTOP or WS_BORDER or LBS_NOINTEGRALHEIGHT,\
+                  LBS_HASSTRINGS or LBS_NOTIFY or WS_TABSTOP or WS_BORDER or LBS_NOINTEGRALHEIGHT or WS_CLIPSIBLINGS,\
                   topx,topy,wid,hgt,parent,idnum,instance,0
     mov hklist, rax
     invoke SendMessage, hklist, WM_SETFONT, rv(GetStockObject, ANSI_VAR_FONT), 0
@@ -262,7 +270,7 @@ select_combo proc instance:QWORD,parent:QWORD,topx:QWORD, \
 
     invoke CreateWindowEx,WS_EX_LEFT,"COMBOBOX",0, WS_CHILD or WS_VISIBLE or \
                           CBS_HASSTRINGS or WS_VSCROLL or CBS_DROPDOWNLIST or \
-                          CBS_NOINTEGRALHEIGHT or CBS_DISABLENOSCROLL, \
+                          CBS_NOINTEGRALHEIGHT or CBS_DISABLENOSCROLL , \
                           topx,topy,wid,hgt,parent,idnum,instance,0
     ret
 
@@ -292,7 +300,7 @@ static endp
 static2 proc instance:QWORD,hparent:QWORD,text:QWORD,topx:QWORD,topy:QWORD,wid:QWORD,hgt:QWORD
 
     invoke CreateWindowEx,WS_EX_LEFT,"STATIC",text, \
-                          WS_CHILD or WS_VISIBLE or WS_CLIPSIBLINGS or SS_SIMPLE	,\
+                          WS_CHILD or WS_VISIBLE or WS_CLIPSIBLINGS or SS_SIMPLE    ,\
                           topx,topy,wid,hgt,hparent,-1,instance,0
     ret
 
@@ -303,7 +311,7 @@ static2 endp
 buttonp proc instance:QWORD,hparent:QWORD,text:QWORD,topx:QWORD,topy:QWORD,wid:QWORD,hgt:QWORD,idnum:QWORD
 
     invoke CreateWindowEx,WS_EX_LEFT,"BUTTON",text, \
-                          WS_CHILD or WS_VISIBLE or WS_TABSTOP or WS_CLIPSIBLINGS	,\
+                          WS_CHILD or WS_VISIBLE or WS_TABSTOP or WS_CLIPSIBLINGS    ,\
                           topx,topy,wid,hgt,hparent,idnum,instance,0
     
     ret
@@ -397,8 +405,6 @@ WRegAssoc macro clave, opcion, namebuf
 endm
 
 
-
-
 fill_cb macro hcombo:req, sel1:req, args:VARARG
     count = 0
     FOR item, <args>
@@ -414,32 +420,39 @@ SaveTargets proc
     USING rbx, r12, r13
     ANNOTATION prv: r15 ; in app_run
     LOCAL opcion[8]:byte
+    LOCAL sCreation[32]:byte
 
     SaveRegs
     mov r12, 0
 
     mov rbx, TheTargets
   loop1i:
-   
+    .if rbx {} 0
         mov opcion, 0
         invoke szappend, addr opcion, "tgt", 0
         mov r13, rax
         invoke szappend, addr opcion, str$(r12), r13
  
-        .if rbx == 0
-            mov r8, 0
-        .else
-            mov r8, [rbx].TheTarget.thestring
-        .endif
+        mov szBuff, 0
+        mov r8, [rbx].TheTarget.thestring
+        invoke szappend, addr szBuff,  r8, 0
+        mov r13, rax
+        fn szappend, addr szBuff, ";", r13
+        mov r13, rax
+        mov r8, [rbx].TheTarget.thecreation
+        invoke szappend, addr szBuff, sstr$(r8), r13
+        mov r13, rax
+        invoke szappend, addr szBuff, ";", r13
+        mov r13, rax
+        mov r8, [rbx].TheTarget.theuse
+        invoke szappend, addr szBuff, str$(r8), r13
 
-        invoke WritePrivateProfileString, addr key3, addr opcion, r8, r15
-        .if rbx == 0
-            jmp loop1f
-        .endif
+        invoke WritePrivateProfileString, addr key3, addr opcion, addr szBuff, r15
 
         mov rbx, [rbx].TheTarget.thenext
         add r12, 1
-        jmp loop1i 
+        jmp loop1i
+    .endif 
   loop1f:
     ret
 SaveTargets endp 
@@ -449,18 +462,18 @@ SaveTargets endp
 RetrieveTargets proc
 
     USING r12, r13
-    LOCAL opcion[8]:byte
+    LOCAL opciont[8]:byte
 
     SaveRegs
 
     mov r12, 0
     mov TheTargets, 0
   loop1i:
-        mov opcion, 0
-        invoke szappend, addr opcion, "tgt", 0
+        mov opciont, 0
+        invoke szappend, addr opciont, "tgt", 0
         mov r13, rax
-        invoke szappend, addr opcion, str$(r12), r13
-        RRegistroOption key3, opcion, empty
+        invoke szappend, addr opciont, str$(r12), r13
+        RRegistroOption key3, opciont, empty
         
         invoke szCheckTarget, addr szBuff
         .if rax == 0
@@ -468,6 +481,7 @@ RetrieveTargets proc
         .endif
         invoke RetrieveTarget, addr szBuff
         invoke SendMessage, hedit1, CB_INSERTSTRING, r12, addr szBuff
+
         add r12, 1
         jmp loop1i 
   loop1f:
@@ -483,13 +497,12 @@ LoadTargets proc
     SaveRegs
     mov rbx, TheTargets
   loop1i:
-        .if rbx == 0
-            jmp loop1f
+        .if rbx {} 0
+            mov r9, [rbx].TheTarget.thestring
+            invoke SendMessage, hedit1, CB_ADDSTRING, 0, r9
+            mov rbx, [rbx].TheTarget.thenext
+            jmp loop1i 
         .endif
-        mov r9, [rbx].TheTarget.thestring
-        invoke SendMessage, hedit1, CB_ADDSTRING, 0, r9
-        mov rbx, [rbx].TheTarget.thenext
-        jmp loop1i 
   loop1f:
     RestoreRegs
     ret
@@ -530,4 +543,27 @@ SaveAssoc proc
     ret
 SaveAssoc endp
 
+;***************************************************************************************************
 
+setsortingorder proc; sort1:qword
+    local sort1:qword
+    mov sort1, rcx
+    .switch sort1
+        .case 0
+            mov sort_asc, 0
+        .case 1
+            mov sort_asc, 1
+        .case 2
+            mov sort_asc, 1
+        .case 3
+            mov sort_asc, 0
+        .case 4
+            mov sort_asc, 0
+        .case 5
+            mov sort_asc, 1
+    .endsw
+    mov rax, sort1
+    shr rax, 1
+    mov sort_kind, rax
+    ret
+setsortingorder endp

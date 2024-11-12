@@ -1,4 +1,4 @@
-\documentclass[11pt,a4paper]{scrartcl}
+\documentclass[11pt,a4paper,numbers=enddot]{scrartcl}
 \usepackage{rawfonts}
 \usepackage{amssymb}
 \usepackage{geometry}
@@ -18,18 +18,18 @@
 \usepackage{sectsty}
 \sectionfont{\color{astral}}
 
-\usepackage[colorlinks=true, urlcolor=blue, linkcolor=red]{hyperref}
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=blue]{hyperref}
 
 \setlength{\parskip}{1.5ex plus 0.5ex minus 0.5ex}
 \usepackage{indentfirst}
 
 \begin{document}
 
-\title{\color{myblue}{LookingFor }}
+\title{\color{myblue}{LookingFor 2.0}}
 \subtitle{\color{myblue}{A Masm64 tool to find strings in files}}
 
 \author{Héctor S. Enrique}
-\date{ may 30, 2024}
+\date{ nov 10, 2024}
 \maketitle
 
 \section{Running the Program: }
@@ -45,8 +45,11 @@
         
         \item Step 2: Enter strings to search. If no string is entered then all files that fit the mask are listed. If there are two strings, files listed match both.
         \item Step 3: For each string set modes to search:
-	 \subitem case: sensitive, insensitive or ignore first char
-	 \subitem word: partial word, full word, or full with underscore (usually a compose word) 
+        
+    \begin{itemize}
+	 \item case: sensitive, insensitive or ignore first char.
+	 \item word: partial word, full word, or full with underscore (usually a compose word). An experimental options is full with points (because ML64 accept the point at name beginning).
+     \end{itemize}
         \item Step 4:  If You want to exclude files fitting some mask, write that in ``excluded'' cell (for example \verb$*.exe|*.lib|*.dll|*.obj$)
         \item Step 5 : When entered two strings, is possible to restrict the search to some distance between them. Enter in cell ``maxDist'' the number of bytes.
         \item Step 6 : Adittionally, files to search can be limited by size writing megabyte size in cell ``maxMb''.
@@ -57,10 +60,15 @@
 
 \section{Values storage: }
 
-	After first running the program will create an .ini file to store current target and search parameters.
+	After first running the program will create an .ini file containing:
 	
-	Buttons ``+'' and ``--'' allow to store or remove current target from an specific list also stored in same file. 
-
+    \begin{itemize}
+	\item Key 1: interface size and position    	
+	\item Key 2: to store current target and search parameters.
+	\item Key 3: prefered list of targets (see \hyperlink{targets}{Targets List}).
+	\item Key 4: default editors for \verb$*.bat$, \verb$*.cmd$ and \verb$*.js$ files (if not present \verb$\masm64\qeditor$).
+	\item Key 5: last sorting order.
+    \end{itemize}
 
 \section {More about file mask}
 
@@ -80,7 +88,14 @@
 	
 	Executable files will not open to prevent unwanted runnings. 
 	
-	In similar way *.bat, *.cmd and *.js files will not run. But in this cases they will open in an editor. By default /masm64/qeditor is that editor. But is possible to select a new path or editor. If default or stored editor fail, a dialog will ask a new path or editor. Later, editor could be changed in LookingFor.ini file.
+	In similar way \verb$*.bat$, \verb$*.cmd$ and \verb$*.js$ files will not run. But in this cases they will open in an editor. By default \verb$\masm64\qeditor$ is that editor. But is possible to select a new path or editor. If default or stored editor fail, a dialog will ask a new path or editor. Later, editor could be changed in LookingFor.ini file.
+
+\hypertarget{targets}{}\section {Targets List} 
+	
+	Buttons ``+'' and ``--'' allow to store or remove current target from an specific list stored in LookingFor.ini file. 
+	
+	Button ``...'' open a dialog with options to sort the targets by storage sequence, characters in target and use frequency, in ascendent or descent order. The ASCII characters are ordered as following: symbols (first half), numbers, letters (case insensible), second half characters (above 127). 
+	
 	
 \section{Knowledgements}
 
@@ -88,8 +103,8 @@
 
 \section{Additional Information}
 
-	The program was builded with Masm64 SDK.
-	
+	The program was builded with \verb$Masm64 SDK$.
+
 	Source code and discussion is is available at:
     \begin{itemize}
 	

@@ -9,6 +9,7 @@
         sWid        dq ?
         sHgt        dq ?
         hStatus     dq ?
+        hTheme      dq ?
     
         pPath       dq ?
         pBuffer     db 260 dup (?)      ; allocate a buffer for the app path
@@ -23,12 +24,15 @@
         lpfnDecProc     dq ?
         lpfnIntProc     dq ?
         lpfnEditProc    dq ?
+        lpfnSBProc      dq ?
 
         hbutton1     dq ?
         hbutton2     dq ?
         hbutton3     dq ?
         hbutton4     dq ?
         hbutton5     dq ?
+        hbutton6     dq ?
+
 
         hstatic1     dq ?
         hstatic2     dq ?
@@ -73,6 +77,7 @@
         but1_b      db "Cancel",0
 
         sb_msg_1    db "Failed!",0
+        sb_list     dw "S","T","A","T","U","S",0
 
         szReg       db "\LookingFor.ini",0
         key1        db "Window",0
@@ -96,8 +101,8 @@
             opt001  db "bat",0
             opt002  db "cmd",0
             opt003  db "js",0
-        ;key5        db "Options",0
-        ;    opt0001 db "point",0
+        key5        db "Options",0
+            opt0001 db "sorting",0
 
         naranja     db "0",0
         unidad      db "1",0
@@ -125,6 +130,14 @@
         maxDist     dd 0
         useExcl     dq 0
 
+        TheTargets  dq 0
+
+        sorting     dq  0
+        sorted      dq  0
+        sort_last   dq  0
+        sort_kind   dq  0
+        sort_asc    dq  0
+
         megabyte    sdword 1024*1024
         filecandt   dq 0
         filecount   dq 0
@@ -143,7 +156,8 @@
         WM_TARGETSLISTCHANGE    dq 0
         WM_EXTASSOCIATIONCHANGE dq 0
 
-        default_editor db "\masm64\qeditor1", 0
+        default_editor db "\masm64\qeditor", 0
+        default_sorting dq 0
 
         err0  db "Could not open",0
         err1  db "There is no application associated",13,10,\
@@ -205,4 +219,7 @@
    ptMinTrackSize  POINT {?}
    ptMaxTrackSize  POINT {?}
  MINMAXINFO ends
-    
+   
+    SP_GRIPPER equ 3
+    TS_DRAW equ 2
+    SBARS_SIZEGRIP equ 0100h

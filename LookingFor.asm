@@ -2,47 +2,38 @@
 
     include \masm64\include64\masm64rt.inc
 
- ;   include \masm64\include64\advapi32.inc
- ;   includelib \masm64\lib64\advapi32.lib
-
 
 ;    AllowPromotions equ 1
 ;    include macros64G3.inc
 
-    LFversion textequ <1.9b>
+    LFversion textequ <2.0>
     include LookingFor.inc
 
     ;   For cleanning disk and possible bugs test use 1 
     TRACKING_CRASH equ 0
 ;    TRACKING_CRASH equ 1       ; Also need to be linked like CONSOLE
 
-test2 struct
-    .left qword 0
-test2 ends
-
-    test3 test2 {2}
-    .code
+.code
 
     include BMSearch.inc        
     include about.inc
     include assoc.inc
+    include options.inc
     include match.inc
     include filetree.inc
     include target.inc
     include app_run.inc
     include more.inc
 
+.data?
+        icex INITCOMMONCONTROLSEX <> ;structure for Calender and Date Picker
+
+.code
+
 ; いいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいいい
 
 entry_point proc
-
-conout str$(test3..left),lf
-
-mov test3..left, 1
-
-conout str$(test3..left),lf
-
-    
+   
 
     GdiPlusBegin                    ; initialise GDIPlus
 
@@ -52,6 +43,8 @@ conout str$(test3..left),lf
     mov sWid,      rv(GetSystemMetrics,SM_CXSCREEN)
     mov sHgt,      rv(GetSystemMetrics,SM_CYSCREEN)
     mov hBrush,    rv(CreateSolidBrush,00C4C4C4h)
+;    mov hBrush2,   rv(CreateSolidBrush,00C400C4h)
+
 
     call app_init                           ; initialise app settings
     call main                               ; call the main app procedure
@@ -124,6 +117,12 @@ app_init proc
     mov hIcon,     rv(LoadImage,hInstance,10,IMAGE_ICON,48,48,LR_LOADTRANSPARENT)
     mov pPath,     rv(GetAppPath,ADDR pBuffer)              ; get the editor path for later use
     
+        mov icex.dwSize,sizeof INITCOMMONCONTROLSEX
+        mov icex.dwICC,ICC_STANDARD_CLASSES or ICC_BAR_CLASSES or ICC_WIN95_CLASSES
+        invoke InitCommonControlsEx,ADDR icex
+
+
+
     ; --------------------
     ;   brush colours
     ; --------------------
@@ -228,7 +227,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
     USING rbx, r12, r13, r14, r15
     LOCAL dfbuff[260]:BYTE
     LOCAL Rct: RECT, Rct1: RECT, hdc:QWORD
-    LOCAL sbh: DWORD, sbParts[2] :DWORD, widths
+    LOCAL sbh: DWORD, sbParts[3]:DWORD, widths:DWORD
     LOCAL rct:RECT, units[2]:word, pt:POINT
 
     .switch uMsg
@@ -257,6 +256,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                         invoke SendMessage, hStatus, SB_SETTEXT, 0, "Canceled!"
                     .endif    
                     .return 0
+
                 .case 203
                      invoke CreateThread, NULL, 0, addr app_help, hWin, 0, NULL
                     .return 0
@@ -268,6 +268,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                     .return 0
 
                 .case 1206
+                                                                            ; "-"
                     invoke SendMessage,hedit1,WM_GETTEXT,256,addr dfbuff
                     invoke RemoveTarget,addr dfbuff
                     invoke SendMessage,hedit1,CB_FINDSTRINGEXACT,-1,addr dfbuff
@@ -287,29 +288,52 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                     .return 0
 
                 .case 1207
-
+                                                                            ; "+"
                     invoke SendMessage,hedit1,WM_GETTEXT,256,addr dfbuff
-                    invoke StoreTarget, addr dfbuff
-                    SaveRegs
-                    mov r15, ptr$(CurDir)
-                    ;lea r14, dfbuff
-                    call SaveTargets
-                    RestoreRegs
-                    mov AddLock, 1
-                    invoke PostMessage,HWND_BROADCAST,WM_TARGETSLISTCHANGE,0,0
-                    invoke SleepEx,100,0
+                    invoke checkname, TheTargets, addr dfbuff
+                    .if rax == 0
+                        invoke StoreTarget, addr dfbuff
+                        SaveRegs
+                        mov r15, ptr$(CurDir)
+                        call SaveTargets
+                        RestoreRegs
+                        mov AddLock, 1
+                        invoke PostMessage,HWND_BROADCAST,WM_TARGETSLISTCHANGE,0,0
+                        invoke SleepEx,100,0
+                    .endif
                     .return 0
+
+                .case 1208      
+                                                                            ; "..."
+                    mov DialogLock, 1
+	             invoke DialogBoxParam, hInstance, 1010, hWin, ADDR OrderOptionsDlg, 0
+                    mov DialogLock, 0
+                    .return 0
+
             .endsw
-    
+
+            mov rax, wParam
+            shr rax, 16
+            .if eax == CBN_SELCHANGE
+                mov rax, lParam
+                .if rax == hedit1
+                    invoke SendMessage, hedit1, CB_GETCURSEL, 0, 0
+                    invoke SendMessage, hedit1, CB_GETLBTEXT, rax, addr szBuff 
+                    invoke findtarget, TheTargets, addr szBuff
+                    inc [rax].TheTarget.theuse
+                .endif
+            .endif
+        
         .case WM_CREATE
-            invoke CreateStatusWindow,WS_CHILD or WS_VISIBLE, NULL, hWin, 201
+            invoke CreateStatusWindow, WS_CHILD or WS_VISIBLE or SBARS_SIZEGRIP, NULL, hWin, 1209
             mov hStatus, rax
     
             mov hbutton1, rv(buttonp,hInstance,hWin, addr but1_a,0,0,0,0,202)
             mov hbutton2, rv(buttonp,hInstance,hWin,"Help",0,0,0,0,203)
             mov hbutton3, rv(buttonp,hInstance,hWin,"About",0,0,0,0,204)
-            mov hbutton4, rv(buttonp,hInstance,hWin," - ",0,0,22,24,1206)
-            mov hbutton5, rv(buttonp,hInstance,hWin," + ",0,0,22,24,1207)
+            mov hbutton4, rv(buttonp,hInstance,hWin,"...",0,0,22,24,1208)
+            mov hbutton5, rv(buttonp,hInstance,hWin," - ",0,0,22,24,1206)
+            mov hbutton6, rv(buttonp,hInstance,hWin," + ",0,0,22,24,1207)
 
             mov hstatic1, rv(static2,hInstance,hWin,"Base directory and files:",0,0,0,0)
             mov hstatic2, rv(staticr,hInstance,hWin,"excluded:  ",0,0,0,0)
@@ -343,6 +367,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             mov lpListProc, rv(SetWindowLongPtr,hlist,GWL_WNDPROC,ADDR ListProc)
             mov lpfnIntProc, rv(SetWindowLongPtr,hedit5,GWL_WNDPROC,addr IntProc)
             mov lpfnDecProc, rv(SetWindowLongPtr,hedit6,GWL_WNDPROC,addr DecProc)
+
             invoke SetWindowLongPtr,hedit2,GWL_WNDPROC,addr EditProc
             invoke SetWindowLongPtr,hedit3,GWL_WNDPROC,addr EditProc
             invoke SetWindowLongPtr,hedit4,GWL_WNDPROC,addr EditProc
@@ -359,9 +384,10 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             RRegMode key2,opt08,naranja,hcb2    
             RRegMode key2,opt09,unidad,hcb3    
             RRegMode key2,opt10,naranja,hcb4    
+            RRegSize key5,opt0001,default_sorting,sorting
+            invoke setsortingorder,sorting
             invoke RetrieveAssoc
             invoke SetFocus, hbutton1		
-
             .return 0
 
         .case WM_TARGETSLISTCHANGE
@@ -374,6 +400,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
                 mov AddLock, 0
             .endif
             .return 0
+
         .case WM_EXTASSOCIATIONCHANGE
             .if AddLock == 0
                 invoke RetrieveAssoc
@@ -382,7 +409,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             .endif
             .return 0
 
-        .elseif eax == WM_GETMINMAXINFO
+        .case WM_GETMINMAXINFO
             invoke GetDC, hWin
             mov hdc, rax
             invoke GetCharWidth32, hdc, 77, 77, addr widths;sbParts
@@ -390,10 +417,10 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             mov eax, widths
             mov ecx, 30
             mul ecx
-            mov     rdx,lParam
-            mov     [rdx].MINMAXINFO.ptMinTrackSize.x, eax
-            mov     [rdx].MINMAXINFO.ptMinTrackSize.y, eax
-            xor     eax,eax
+            mov rdx,lParam
+            mov [rdx].MINMAXINFO.ptMinTrackSize.x, eax
+            mov [rdx].MINMAXINFO.ptMinTrackSize.y, eax
+            xor eax,eax
     
         .case WM_SIZE
             SaveRegs
@@ -401,16 +428,14 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             mov ebx, Rct.right
             shr rbx, 1
             mov sbParts, ebx
-
             invoke MoveWindow,hStatus,0,0,0,0,TRUE
-            ;invoke SendMessage, hStatus, SB_SETPARTS, 2, ADDR sbParts
 
             invoke GetClientRect,hStatus,ADDR Rct1
             mov eax, Rct1.bottom
             mov sbh, eax      ; status bar height
             mov rax, rbx
             sub rax, 6
-            invoke MoveWindow, hstatic1, 3, 3, rax, 22,TRUE
+            invoke MoveWindow, hstatic1, 3, 6, rax, 22,TRUE
             invoke SendMessage,hstatic1, BN_PAINT,0,0
             mov rax, rbx
             mov rcx, 3
@@ -433,13 +458,16 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             mov r15d, Rct.right
             sub r15, 6
             mov r14, r15
-            sub r14, 57 
+            sub r14, 57+24 
             mov eax, Rct.bottom
             invoke MoveWindow, hedit1,3,33,r14,rax,TRUE
             add r14, 6
             invoke MoveWindow, hbutton4,r14,33,24,24,TRUE
             add r14, 27
             invoke MoveWindow, hbutton5,r14,33,24,24,TRUE
+            add r14, 27
+            invoke MoveWindow, hbutton6,r14,33,24,24,TRUE
+
 
             invoke MoveWindow, hgbox1,3,63,r15,57,TRUE
             invoke MoveWindow, hgbox2,3,123,r15,57,TRUE
@@ -489,9 +517,8 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             invoke MoveWindow, hlist, 3, 210, r15,rax,TRUE
     
             RestoreRegs
-            
+
         .case WM_CLOSE
-            
             invoke GetWindowRect, hWin, addr rct
             mov eax, rct.left
             mov glft, rax
@@ -522,6 +549,7 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             WRegMode key2,opt08,hcb2    
             WRegMode key2,opt09,hcb3    
             WRegMode key2,opt10,hcb4    
+            WRegSize key5,opt0001,sorting
             call SaveTargets
             RestoreRegs
             invoke SendMessage,hWin,WM_DESTROY,0,0
@@ -559,9 +587,13 @@ WndProc proc hWin:QWORD,uMsg:QWORD,wParam:QWORD,lParam:QWORD
             rcall SetTextColor,wParam,00DDDDDDh
             mov rax, eColor
             ret
+        .case WM_CTLCOLORSCROLLBAR
+            mov rax, aBrush;eColor
+            ret
 
     .endsw
 
+follow:
     invoke DefWindowProc,hWin,uMsg,wParam,lParam
 
     ret
